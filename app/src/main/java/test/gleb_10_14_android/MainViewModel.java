@@ -12,8 +12,13 @@ public class MainViewModel  extends BaseObservable implements MainContract.ViewM
 
     private Context ctx;
     private MainContract.View view = null;
-    public MutableLiveData<Boolean> recording = new MutableLiveData<>();
-    public MutableLiveData<Boolean> playing = new MutableLiveData<>();
+
+    enum State { None, Playing, Recording }
+
+    public MutableLiveData<State> state = new MutableLiveData<>();
+
+
+    public ObservableField<Boolean> processing = new ObservableField<>(false);
     public ObservableField<String> startButtonCaption = new ObservableField<>();
 
     public MainViewModel(
@@ -23,20 +28,23 @@ public class MainViewModel  extends BaseObservable implements MainContract.ViewM
         this.ctx = ctx;
         this.view = view;
 
-//        recording.setValue(false);
-//        recording.setValue(false);
-
-        recording.observe(
+        state.observe(
             view.getOwner(),
             value -> {
-                if (value) {
-                    startButtonCaption.set(ctx.getString(R.string.start_record));
-                } else {
-                    startButtonCaption.set(ctx.getString(R.string.stop_record));
+                switch (value) {
+                    case None:
+                        startButtonCaption.set(ctx.getString(R.string.start_record));
+                        break;
+                    case Playing:
+                        startButtonCaption.set(ctx.getString(R.string.stop_playing));
+                        break;
+                    case Recording:
+                        startButtonCaption.set(ctx.getString(R.string.stop_record));
+                        break;
                 }
             }
         );
-        recording.postValue(false);
+        state.postValue(State.None);
     }
 
     private MainContract.Model model = null;
@@ -45,6 +53,18 @@ public class MainViewModel  extends BaseObservable implements MainContract.ViewM
     }
 
     public void startOrStopRecord() {
-        recording.postValue(!recording.getValue());
+        view.withPermissionsChecked(() -> {
+            switch (state.getValue()) {
+                case None:
+                    state.postValue(State.Recording);
+                    break;
+                case Playing:
+                    state.postValue(State.None);
+                    break;
+                case Recording:
+                    state.postValue(State.None);
+                    break;
+            }
+        });
     }
 }

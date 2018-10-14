@@ -6,6 +6,7 @@ public interface MainContract {
 
     interface View {
         LifecycleOwner getOwner();
+        void withPermissionsChecked(Runnable r);
     }
 
     interface ViewModel {
