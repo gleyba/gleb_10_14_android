@@ -13,9 +13,9 @@ file(
     src/main/cpp/jni/*.hpp
     src/main/cpp/src/*.cpp
     src/main/cpp/src/*.hpp
-    src/main/cpp/src/utility/*.cpp
-    src/main/cpp/src/utility/*.hpp
 )
+
+include_directories(src/main/cpp/deps/include)
 
 add_library(
     native-lib

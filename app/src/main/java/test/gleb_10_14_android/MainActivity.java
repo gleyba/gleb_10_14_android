@@ -19,6 +19,8 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
 
     // Used to load the 'native-lib' library on application startup.
     static {
+        System.loadLibrary("ogg");
+        System.loadLibrary("vorbis");
         System.loadLibrary("native-lib");
     }
 
