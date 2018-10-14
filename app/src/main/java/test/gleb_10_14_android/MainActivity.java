@@ -1,8 +1,11 @@
 package test.gleb_10_14_android;
 
+import android.arch.lifecycle.LifecycleOwner;
+import android.databinding.DataBindingUtil;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.widget.TextView;
+
+import test.gleb_10_14_android.databinding.ActivityMainBinding;
 
 public class MainActivity extends AppCompatActivity implements MainContract.View {
 
@@ -16,20 +19,20 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
         super.onCreate(savedInstanceState);
 
 
-        MainContract.ViewModel viewModel = new MainViewModel(
-            this
+        MainViewModel viewModel = new MainViewModel(this,this);
+        viewModel.setModel(new MainModel(this,viewModel));
+
+
+        ActivityMainBinding binding = DataBindingUtil.setContentView(
+            this,
+            R.layout.activity_main
         );
+        binding.setViewmodel(viewModel);
+    }
 
-        MainModel = new MainModel(this,viewModel);
-
-
-        setContentView(R.layout.activity_main);
-
-
-
-        // Example of a call to a native method
-        TextView tv = (TextView) findViewById(R.id.sample_text);
-        tv.setText(stringFromJNI());
+    @Override
+    public LifecycleOwner getOwner() {
+        return this;
     }
 
     public native String stringFromJNI();

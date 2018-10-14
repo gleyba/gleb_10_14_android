@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">gleb_10_14_android</string>
+    <string name="start_record">Start Record</string>
+    <string name="stop_record">Stop Record</string>
 </resources>

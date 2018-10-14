@@ -8,11 +8,12 @@ public class MainModel implements MainContract.Model {
     private MainContract.ViewModel viewModel;
 
     public MainModel(
-            Context ctx,
-            MainContract.ViewModel viewModel
+        Context ctx,
+        MainContract.ViewModel viewModel
     ) {
         this.ctx = ctx;
         this.viewModel = viewModel;
 
     }
+
 }
