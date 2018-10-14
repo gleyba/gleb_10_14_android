@@ -15,7 +15,10 @@ file(
     src/main/cpp/src/*.hpp
 )
 
-include_directories(src/main/cpp/deps/include)
+include_directories(
+    src/main/cpp/deps/include
+    src/main/cpp/src
+)
 
 add_library(
     native-lib

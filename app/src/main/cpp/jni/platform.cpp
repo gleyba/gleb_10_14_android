@@ -24,7 +24,7 @@ CJNICALL(void) Java_test_gleb_110_114_1android_cppiface_NativeRef_release(
     jclass,
     jlong ref
 ) {
-    delete reinterpret_cast<void*>(ref);
+    delete reinterpret_cast<NativeRef*>(ref);
 }
 
 void attachThread() {

@@ -1,6 +1,6 @@
 package test.gleb_10_14_android.cppiface;
 
-public class NativeRef {
+public final class NativeRef {
 
     private static native void release(long ref);
 

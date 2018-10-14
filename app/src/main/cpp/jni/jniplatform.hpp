@@ -81,3 +81,17 @@ public:
     size_t size() { return _size; }
 
 };
+
+class NativeRef {};
+template<typename T>
+class NativeRefHolder : public NativeRef{
+    std::unique_ptr<T> _ref;
+
+public:
+
+    template <typename... T_Args>
+    NativeRefHolder(T_Args... args) {
+        _ref = std::make_unique<T>(std::forward<T_Args>(args)...);
+    }
+
+};
