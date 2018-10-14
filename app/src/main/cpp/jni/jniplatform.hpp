@@ -94,4 +94,10 @@ public:
         _ref = std::make_unique<T>(std::forward<T_Args>(args)...);
     }
 
+    T* ref() { return _ref.get(); }
 };
+
+template <typename T>
+T* getRef(jlong ref) {
+    return reinterpret_cast<NativeRefHolder<T>*>(ref)->ref();
+}

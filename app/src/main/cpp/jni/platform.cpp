@@ -93,3 +93,4 @@ JNIByteArray::JNIByteArray(
 JNIByteArray::~JNIByteArray() {
     _env->ReleaseByteArrayElements(_jData,_data,0);
 }
+

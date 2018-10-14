@@ -16,6 +16,7 @@ public class AudioRecorderTask extends AsyncTask<Void,Void,Void> {
         Channels,
         AudioFormat.ENCODING_PCM_16BIT
     );
+    private static float Quality = 1;
     private static int ReadSize = 1024;
 
     private final AudioRecord audioRecorder = new AudioRecord(
@@ -31,18 +32,23 @@ public class AudioRecorderTask extends AsyncTask<Void,Void,Void> {
     public AudioRecorderTask(
         String fileName
     ) {
-        this.encoder = new VorbisFileEncoder(fileName);
+        this.encoder = new VorbisFileEncoder(
+            fileName,
+            Channels,
+            SampleRate,
+            Quality
+        );
     }
 
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
+        assert(encoder.initialize());
         audioRecorder.startRecording();
     }
 
     @Override
     protected Void doInBackground(Void... voids) {
-
         return null;
     }
 
