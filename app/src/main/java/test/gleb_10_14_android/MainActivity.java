@@ -1,6 +1,7 @@
 package test.gleb_10_14_android;
 
 import android.arch.lifecycle.LifecycleOwner;
+import android.arch.lifecycle.LiveData;
 import android.content.pm.PackageManager;
 import android.databinding.DataBindingUtil;
 import android.os.Build;
@@ -11,7 +12,6 @@ import android.widget.Toast;
 
 import static android.Manifest.permission.RECORD_AUDIO;
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
-import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
 
 import test.gleb_10_14_android.databinding.ActivityMainBinding;
 
@@ -24,6 +24,8 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
         System.loadLibrary("native-lib");
     }
 
+    private ActivityMainBinding binding;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,7 +35,7 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
         viewModel.setModel(new MainModel(this,viewModel));
 
 
-        ActivityMainBinding binding = DataBindingUtil.setContentView(
+        binding = DataBindingUtil.setContentView(
             this,
             R.layout.activity_main
         );
@@ -44,7 +46,33 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
             graphArray[i] = i % 50;
         }
 
-        binding.graph.setGraphArray(graphArray);
+    }
+
+    public static int safeLongToInt(long l) {
+        if (l < Integer.MIN_VALUE || l > Integer.MAX_VALUE) {
+            throw new IllegalArgumentException
+                    (l + " cannot be cast to int without changing its value.");
+        }
+        return (int) l;
+    }
+
+    @Override
+    public void start(LiveData<Long> soundEnergy) {
+        binding.soundEnergy.setText("");
+        binding.graph.flush();
+        binding.graph.invalidate();
+        soundEnergy.observe(
+            this,
+            value -> {
+                binding.graph.addValue(safeLongToInt(value));
+                binding.graph.invalidate();
+                binding.soundEnergy.setText(getString(R.string.sound_energy_lvl) + ": " + String.valueOf(value));
+            }
+        );
+    }
+
+    @Override
+    public void stop() {
     }
 
     @Override

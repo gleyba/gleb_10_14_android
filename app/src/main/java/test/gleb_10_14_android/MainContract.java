@@ -8,6 +8,8 @@ public interface MainContract {
     interface View {
         LifecycleOwner getOwner();
         void withPermissionsChecked(Runnable r);
+        void start(LiveData<Long> soundEnergy);
+        void stop();
     }
 
     interface ViewModel {

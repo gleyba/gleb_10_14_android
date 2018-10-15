@@ -23,7 +23,6 @@ public class MainViewModel  extends BaseObservable implements MainContract.ViewM
 
     public ObservableField<Boolean> processing = new ObservableField<>(false);
     public ObservableField<String> startButtonCaption = new ObservableField<>();
-    public ObservableField<String> soundEnergyLevel = new ObservableField<>();
 
     public MainViewModel(
         Context ctx,
@@ -74,21 +73,18 @@ public class MainViewModel  extends BaseObservable implements MainContract.ViewM
                         break;
                     }
 
-                    soundLevel.observe(
-                        view.getOwner(),
-                        value -> {
-                            soundEnergyLevel.set(String.valueOf(value));
-                        }
-                    );
+                    view.start(soundLevel);
 
                     state.postValue(State.Recording);
                     break;
                 case Playing:
                     model.stop();
+                    view.stop();
                     state.postValue(State.None);
                     break;
                 case Recording:
                     model.stop();
+                    view.stop();
                     state.postValue(State.None);
                     break;
             }

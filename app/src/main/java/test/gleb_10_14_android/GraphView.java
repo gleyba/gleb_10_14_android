@@ -3,6 +3,7 @@ package test.gleb_10_14_android;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.util.AttributeSet;
 import android.view.View;
 
@@ -14,11 +15,13 @@ public class GraphView extends View {
 
     private int graphArray[] = new int[Size];
     private int maxY = 0;
+    private int minY = Integer.MAX_VALUE;
 
     private int startPos = 0;
     private int endPos = 0;
 
     private Paint paint;
+    private Path path;
 
     public GraphView(Context context) {
         super(context);
@@ -38,72 +41,71 @@ public class GraphView extends View {
     private void init() {
         paint = new Paint();
         paint.setColor(Color.GREEN);
-        paint.setStrokeWidth(10);
+        paint.setStrokeWidth(5);
+        paint.setStyle(Paint.Style.STROKE);
+
+        path = new Path();
     }
 
-//    public void setGraphArray(int Xi_graphArray[], int Xi_maxY)
-//    {
-//        m_graphArray = Xi_graphArray;
-//        m_maxY = Xi_maxY;
-//    }
-//
-//    public void setGraphArray(int Xi_graphArray[])
-//    {
-//        int maxY = 0;
-//        for(int i = 0; i < Xi_graphArray.length; ++i)
-//        {
-//            if(Xi_graphArray[i] > maxY)
-//            {
-//                maxY = Xi_graphArray[i];
-//            }
-//        }
-//        setGraphArray(Xi_graphArray, maxY);
-//    }
+    public void addValue(int value) {
+        graphArray[endPos] = value;
 
-    private void iterate(
-        Canvas canvas,
-        int i,
-        int curPos,
-        int prevPos,
-        float factorX,
-        float factorY
-    ) {
-        int x0 = i - 1;
-        int y0 = graphArray[curPos];
-        int x1 = i;
-        int y1 = graphArray[prevPos];
+        if (++endPos == Size) {
+            endPos = 0;
+        }
+        if (endPos == startPos) {
+            if (++startPos == Size) {
+                startPos = 0;
+            }
+        }
 
-        int sx = (int)(x0 * factorX);
-        int sy = getHeight() - (int)(y0* factorY);
-        int ex = (int)(x1*factorX);
-        int ey = getHeight() - (int)(y1* factorY);
-        canvas.drawLine(sx, sy, ex, ey, paint);
+        if (maxY < value) {
+            maxY = value;
+        }
+        if (minY > value) {
+            minY = value;
+        }
     }
 
+    public void flush() {
+        endPos = 0;
+        startPos = 0;
+        minY = 0;
+        maxY = 0;
+    }
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        if(Math.abs(startPos - endPos) < 2) {
+        if (startPos == endPos || startPos == endPos -1) {
             return;
         }
+
+        path.reset();
 
         float factorX = getWidth() / (float)Size;
         float factorY = getHeight() / (float)maxY;
 
-        int prevPos = startPos;
-        int curPos = startPos + 1;
+        int curPos = startPos;
 
-        for(int i = 1; i < Size; ++i) {
-            iterate(
-                canvas,
-                i,
-                curPos,
-                prevPos,
-                factorX,
-                factorY
-            );
+        for(int i = 0; i < Size; ++i) {
+            int sx = (int)(i * factorX);
+            int sy = getHeight() - (int)((graphArray[curPos] - minY)* factorY);
+
+            if (i != 0) {
+                path.lineTo(sx,sy);
+            }
+            path.moveTo(sx,sy);
+
+            if (++curPos == Size) {
+                curPos = 0;
+            }
+            if (curPos == endPos) {
+                break;
+            }
         }
+
+        canvas.drawPath(path, paint);
     }
 }
