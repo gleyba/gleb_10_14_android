@@ -31,7 +31,7 @@ Java_test_gleb_110_114_1android_cppiface_VorbisFileEncoder_nativeInitialize(
 }
 
 CJNICALL(void)
-Java_test_gleb_110_114_1android_cppiface_VorbisFileEncoder_nativeDeIitialize(
+Java_test_gleb_110_114_1android_cppiface_VorbisFileEncoder_nativeDeInitialize(
     JNIEnv *env,
     jclass type,
     jlong ref
@@ -62,7 +62,6 @@ Java_test_gleb_110_114_1android_cppiface_VorbisFileEncoder_nativeSetEnergyLevelL
 
     getRef<VorbisFileEncoder>(ref)->setSoundEnergyLevelListener(
         [listenerSh](long level) {
-            logstr("onEnergyLevelCalculated: " + std::to_string(level));
             listenerSh->onEnergyLevelCalculated(level);
         }
     );

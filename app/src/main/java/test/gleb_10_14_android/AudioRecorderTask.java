@@ -80,6 +80,7 @@ public class AudioRecorderTask extends AsyncTask<Void,Void,Void> {
                     break;
             }
         }
+        audioRecorder.stop();
         encoder.deInitialize();
         return null;
     }

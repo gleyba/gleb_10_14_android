@@ -18,7 +18,7 @@
         >
 
         <Button
-            android:id="@+id/button2"
+            android:id="@+id/startStopBtn"
             android:layout_width="142dp"
             android:layout_height="45dp"
             android:layout_marginEnd="8dp"
@@ -31,15 +31,33 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"/>
 
-        <TextView
-            android:id="@+id/textView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+
+        <LinearLayout
+            android:layout_width="360dp"
+            android:layout_height="80dp"
+            android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
-            android:text="@{viewmodel.soundEnergyLevel}"
+            android:orientation="vertical"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/button2"/>
+            app:layout_constraintTop_toBottomOf="@+id/startStopBtn">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="@{viewmodel.soundEnergyLevel}"
+                android:orientation="vertical"/>
+
+            <test.gleb_10_14_android.GraphView
+                android:id="@+id/graph"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+            </test.gleb_10_14_android.GraphView>
+
+        </LinearLayout>
 
     </android.support.constraint.ConstraintLayout>
 </layout>

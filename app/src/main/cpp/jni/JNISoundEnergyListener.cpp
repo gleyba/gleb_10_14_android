@@ -1,4 +1,5 @@
 #include "JNISoundEnergyListener.hpp"
+#include "platform.hpp"
 
 std::once_flag JNISoundEnergyListener::sMethodsOnce;
 
@@ -20,9 +21,11 @@ JNISoundEnergyListener::JNISoundEnergyListener(
 }
 
 void JNISoundEnergyListener::onEnergyLevelCalculated(long soundEnergy) {
+//    logstr("onEnergyLevelCalculated: " + std::to_string(soundEnergy));
+    jlong jSoundEnergy = soundEnergy;
     jniGetThreadEnv()->CallVoidMethod(
         _soundEnergyListener.get(),
         sOnEnergyLevelCalculated,
-        soundEnergy
+        jSoundEnergy
     );
 }

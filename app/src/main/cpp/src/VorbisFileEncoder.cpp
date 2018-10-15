@@ -167,14 +167,14 @@ void VorbisFileEncoder::deInitialize() {
     if (_file.is_open()) {
         _file.close();
     }
-}
-
-
-VorbisFileEncoder::~VorbisFileEncoder() {
-    deInitialize();
     ogg_stream_clear(&os);
     vorbis_block_clear(&vb);
     vorbis_dsp_clear(&vd);
     vorbis_comment_clear(&vc);
     vorbis_info_clear(&vi);
+}
+
+
+VorbisFileEncoder::~VorbisFileEncoder() {
+    deInitialize();
 }

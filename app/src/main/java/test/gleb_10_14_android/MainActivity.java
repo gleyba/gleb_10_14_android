@@ -38,6 +38,13 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
             R.layout.activity_main
         );
         binding.setViewmodel(viewModel);
+
+        int graphArray[] = new int[256];
+        for(int i = 0; i < graphArray.length; ++i) {
+            graphArray[i] = i % 50;
+        }
+
+        binding.graph.setGraphArray(graphArray);
     }
 
     @Override

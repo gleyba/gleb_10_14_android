@@ -14,7 +14,6 @@ public class MainModel implements MainContract.Model {
     ) {
         this.ctx = ctx;
         this.viewModel = viewModel;
-
     }
 
     AudioRecorderTask recorderTask = null;
@@ -30,6 +29,7 @@ public class MainModel implements MainContract.Model {
     public void stop() {
         if (recorderTask != null) {
             recorderTask.cancel(false);
+            recorderTask = null;
         }
     }
 }
