@@ -105,10 +105,15 @@ void VorbisFileEncoder::writePcm(const char* readbuffer, long size) {
             buffer[channel][i]=((readbuffer[i*(2*_channels)+(channel*2+1)]<<8)|
                                 (0x00ff&(int)readbuffer[i*(2*_channels)+(channel*2)]))/32768.f;
         }
+    }
 
-        if (_soundEnergyLevelListener) {
-
+    if (_soundEnergyLevelListener) {
+        long sumOfSampleSquares = 0;
+        for(i=0;i<size;i++) {
+            short sample = readbuffer[i];
+            sumOfSampleSquares += sample * sample;
         }
+        _soundEnergyLevelListener(sumOfSampleSquares/size);
     }
 
     /* tell the library how much we actually submitted */
