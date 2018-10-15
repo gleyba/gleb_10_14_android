@@ -43,7 +43,7 @@ bool VorbisFileEncoder::initialize() {
     /* add a comment */
     logstr("VorbisEncoder: Adding comments");
     vorbis_comment_init(&vc);
-    vorbis_comment_add_tag(&vc,"ENCODER","JNIVorbisEncoder");
+    vorbis_comment_add_tag(&vc,"ENCODER","VorbisEncoder");
 
     /* set up the analysis state and auxiliary encoding storage */
     vorbis_analysis_init(&vd,&vi);

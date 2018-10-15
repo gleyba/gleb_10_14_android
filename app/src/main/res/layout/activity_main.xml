@@ -4,11 +4,14 @@
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         tools:context=".MainActivity">
+
     <data>
+
         <variable
             name="viewmodel"
             type="test.gleb_10_14_android.MainViewModel"/>
-        <import type="android.view.View" />
+
+        <import type="android.view.View"/>
     </data>
 
 
@@ -24,7 +27,6 @@
             android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
-            android:enabled="@{!viewmodel.processing}"
             android:onClick="@{() -> viewmodel.startOrStopRecord()}"
             android:text="@{viewmodel.startButtonCaption}"
             app:layout_constraintEnd_toEndOf="parent"
@@ -33,6 +35,7 @@
 
 
         <LinearLayout
+            android:id="@+id/linearLayout"
             android:layout_width="360dp"
             android:layout_height="100dp"
             android:layout_marginEnd="8dp"
@@ -58,6 +61,20 @@
             </test.gleb_10_14_android.GraphView>
 
         </LinearLayout>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/rv"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:enabled="@{viewmodel.notProcessing}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/linearLayout"/>
 
     </android.support.constraint.ConstraintLayout>
 </layout>

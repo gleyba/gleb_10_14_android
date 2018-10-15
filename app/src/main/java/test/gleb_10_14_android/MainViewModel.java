@@ -21,7 +21,7 @@ public class MainViewModel  extends BaseObservable implements MainContract.ViewM
     public MutableLiveData<State> state = new MutableLiveData<>();
 
 
-    public ObservableField<Boolean> processing = new ObservableField<>(false);
+    public ObservableField<Boolean> notProcessing = new ObservableField<>(true);
     public ObservableField<String> startButtonCaption = new ObservableField<>();
 
     public MainViewModel(
@@ -74,18 +74,20 @@ public class MainViewModel  extends BaseObservable implements MainContract.ViewM
                     }
 
                     view.start(soundLevel);
-
                     state.postValue(State.Recording);
+                    notProcessing.set(false);
                     break;
                 case Playing:
                     model.stop();
                     view.stop();
                     state.postValue(State.None);
+                    notProcessing.set(true);
                     break;
                 case Recording:
                     model.stop();
                     view.stop();
                     state.postValue(State.None);
+                    notProcessing.set(true);
                     break;
             }
         });

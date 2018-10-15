@@ -10,6 +10,12 @@ public interface MainContract {
         void withPermissionsChecked(Runnable r);
         void start(LiveData<Long> soundEnergy);
         void stop();
+
+        interface Adapter {
+
+            void addItems(String[] data);
+
+        }
     }
 
     interface ViewModel {
