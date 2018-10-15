@@ -1,5 +1,6 @@
 package test.gleb_10_14_android;
 
+import android.arch.lifecycle.LiveData;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
@@ -11,8 +12,8 @@ import test.gleb_10_14_android.cppiface.VorbisFileEncoder;
 public class AudioRecorderTask extends AsyncTask<Void,Void,Void> {
 
     private static final String TAG = "AudioRecorderTask";
-    private static final int SampleRate = 44100;
-    private static final int Channels = 2;
+    private static final int SampleRate = 16000;
+    private static final int Channels = 1;
     private static final int ChannelConfiguration
         = Channels == 1
             ? AudioFormat.CHANNEL_IN_MONO
@@ -49,10 +50,14 @@ public class AudioRecorderTask extends AsyncTask<Void,Void,Void> {
         );
     }
 
+    public LiveData<Long> soundEnergy() {
+        return encoder.soundEnergy();
+    }
+
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
-        assert(encoder.initialize());
+        encoder.initialize();
         audioRecorder.startRecording();
     }
 
@@ -75,12 +80,8 @@ public class AudioRecorderTask extends AsyncTask<Void,Void,Void> {
                     break;
             }
         }
+        encoder.deInitialize();
         return null;
     }
 
-    @Override
-    protected void onPostExecute(Void result) {
-        super.onPostExecute(result);
-        encoder.deInitialize();
-    }
 }

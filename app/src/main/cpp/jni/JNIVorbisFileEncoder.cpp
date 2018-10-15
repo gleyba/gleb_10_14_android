@@ -1,6 +1,7 @@
 #include "jniplatform.hpp"
 #include "VorbisFileEncoder.hpp"
 #include "JNISoundEnergyListener.hpp"
+#include "platform.hpp"
 
 CJNICALL(jlong)
 Java_test_gleb_110_114_1android_cppiface_VorbisFileEncoder_create(
@@ -57,9 +58,12 @@ Java_test_gleb_110_114_1android_cppiface_VorbisFileEncoder_nativeSetEnergyLevelL
     jlong ref,
     jobject listener
 ) {
+    auto listenerSh = std::make_shared<JNISoundEnergyListener>(env,listener);
+
     getRef<VorbisFileEncoder>(ref)->setSoundEnergyLevelListener(
-        [listener = std::make_shared<JNISoundEnergyListener>(env,listener)](long level) mutable {
-            listener->onEnergyLevelCalculated(level);
+        [listenerSh](long level) {
+            logstr("onEnergyLevelCalculated: " + std::to_string(level));
+            listenerSh->onEnergyLevelCalculated(level);
         }
     );
 }

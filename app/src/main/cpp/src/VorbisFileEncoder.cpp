@@ -92,6 +92,7 @@ void VorbisFileEncoder::setSoundEnergyLevelListener(std::function<void(long)> li
 }
 
 void VorbisFileEncoder::writePcm(const char* readbuffer, long size) {
+//    logstr("VorbisFileEncoder::writePcm size:" + std::to_string(size));
     long i;
     /* data to encode */
 
@@ -110,10 +111,12 @@ void VorbisFileEncoder::writePcm(const char* readbuffer, long size) {
     if (_soundEnergyLevelListener) {
         long sumOfSampleSquares = 0;
         for(i=0;i<size;i++) {
-            short sample = readbuffer[i];
+            long sample = readbuffer[i];
             sumOfSampleSquares += sample * sample;
         }
-        _soundEnergyLevelListener(sumOfSampleSquares/size);
+        long soundEnergy = sumOfSampleSquares/size;
+//        logstr("VorbisFileEncoder::writePcm sumOfSampleSquares:" + std::to_string(sumOfSampleSquares));
+        _soundEnergyLevelListener(soundEnergy);
     }
 
     /* tell the library how much we actually submitted */

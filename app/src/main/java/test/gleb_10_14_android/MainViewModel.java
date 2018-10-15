@@ -7,6 +7,9 @@ import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import android.databinding.ObservableField;
 
+import java.nio.charset.Charset;
+import java.util.Random;
+
 public class MainViewModel  extends BaseObservable implements MainContract.ViewModel {
 
 
@@ -20,6 +23,7 @@ public class MainViewModel  extends BaseObservable implements MainContract.ViewM
 
     public ObservableField<Boolean> processing = new ObservableField<>(false);
     public ObservableField<String> startButtonCaption = new ObservableField<>();
+    public ObservableField<String> soundEnergyLevel = new ObservableField<>();
 
     public MainViewModel(
         Context ctx,
@@ -56,12 +60,35 @@ public class MainViewModel  extends BaseObservable implements MainContract.ViewM
         view.withPermissionsChecked(() -> {
             switch (state.getValue()) {
                 case None:
+                    byte[] array = new byte[7]; // length is bounded by 7
+                    new Random().nextBytes(array);
+
+                    LiveData<Long> soundLevel = model.startRecord(
+                        ctx.getFilesDir()
+                        + "/"
+                        + new String(array, Charset.forName("UTF-8"))
+                        + ".ogg"
+                    );
+
+                    if (soundLevel == null) {
+                        break;
+                    }
+
+                    soundLevel.observe(
+                        view.getOwner(),
+                        value -> {
+                            soundEnergyLevel.set(String.valueOf(value));
+                        }
+                    );
+
                     state.postValue(State.Recording);
                     break;
                 case Playing:
+                    model.stop();
                     state.postValue(State.None);
                     break;
                 case Recording:
+                    model.stop();
                     state.postValue(State.None);
                     break;
             }
