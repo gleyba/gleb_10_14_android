@@ -33,11 +33,21 @@ implements MainContract.View.Adapter
     }
 
     @Override
-    public void addItems(String[] data) {
+    public void addItems(ArrayList<String> data) {
+        if (data.size() == 0) {
+            return;
+        }
+
         int prevSize = items.size();
-        Collections.addAll(items, data);
+        items.addAll(data);
         notifyItemRangeInserted(prevSize, items.size() - prevSize);
 
+    }
+
+    @Override
+    public void addItem(String data) {
+        items.add(data);
+        notifyItemInserted(items.size() - 1);
     }
 
     @Override

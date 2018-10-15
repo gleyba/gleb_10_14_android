@@ -4,14 +4,13 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.content.Context;
 import android.databinding.BaseObservable;
-import android.databinding.Bindable;
 import android.databinding.ObservableField;
 
 import java.nio.charset.Charset;
-import java.util.Random;
 
-public class MainViewModel  extends BaseObservable implements MainContract.ViewModel {
-
+public class MainViewModel
+extends BaseObservable
+implements MainContract.ViewModel {
 
     private Context ctx;
     private MainContract.View view = null;
@@ -53,21 +52,19 @@ public class MainViewModel  extends BaseObservable implements MainContract.ViewM
     private MainContract.Model model = null;
     public void setModel( MainContract.Model model) {
         this.model = model;
+        view.adapter().addItems(model.getAllOggFiles());
+        model.newOggFile().observe(
+            view.getOwner(),
+            view.adapter()::addItem
+        );
     }
 
     public void startOrStopRecord() {
         view.withPermissionsChecked(() -> {
             switch (state.getValue()) {
                 case None:
-                    byte[] array = new byte[7]; // length is bounded by 7
-                    new Random().nextBytes(array);
 
-                    LiveData<Long> soundLevel = model.startRecord(
-                        ctx.getFilesDir()
-                        + "/"
-                        + new String(array, Charset.forName("UTF-8"))
-                        + ".ogg"
-                    );
+                    LiveData<Long> soundLevel = model.startRecord();
 
                     if (soundLevel == null) {
                         break;

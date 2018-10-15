@@ -3,6 +3,8 @@ package test.gleb_10_14_android;
 import android.arch.lifecycle.LifecycleOwner;
 import android.arch.lifecycle.LiveData;
 
+import java.util.ArrayList;
+
 public interface MainContract {
 
     interface View {
@@ -13,9 +15,11 @@ public interface MainContract {
 
         interface Adapter {
 
-            void addItems(String[] data);
-
+            void addItems(ArrayList<String> data);
+            void addItem(String data);
         }
+
+        Adapter adapter();
     }
 
     interface ViewModel {
@@ -23,7 +27,9 @@ public interface MainContract {
     }
 
     interface Model {
-        LiveData<Long> startRecord(String fileName);
+        ArrayList<String> getAllOggFiles();
+        LiveData<String> newOggFile();
+        LiveData<Long> startRecord();
         void stop();
     }
 }

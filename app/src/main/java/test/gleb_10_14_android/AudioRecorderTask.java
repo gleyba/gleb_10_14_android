@@ -37,17 +37,24 @@ public class AudioRecorderTask extends AsyncTask<Void,Void,Void> {
         BufferSize
     );
 
+    private final String fileName;
     private final VorbisFileEncoder encoder;
 
     public AudioRecorderTask(
+        String dir,
         String fileName
     ) {
+        this.fileName = fileName;
         this.encoder = new VorbisFileEncoder(
-            fileName,
+            dir + "/" + fileName,
             Channels,
             SampleRate,
             Quality
         );
+    }
+
+    public String getFileName() {
+        return fileName;
     }
 
     public LiveData<Long> soundEnergy() {

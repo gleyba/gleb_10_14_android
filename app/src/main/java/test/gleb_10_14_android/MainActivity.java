@@ -25,6 +25,7 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
     }
 
     private ActivityMainBinding binding;
+    private MainViewRowsAdapter rowsAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,14 +33,16 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
 
 
         MainViewModel viewModel = new MainViewModel(this,this);
-        viewModel.setModel(new MainModel(this,viewModel));
-
 
         binding = DataBindingUtil.setContentView(
             this,
             R.layout.activity_main
         );
+        rowsAdapter = new MainViewRowsAdapter();
+        binding.recycler.setAdapter(rowsAdapter);
         binding.setViewmodel(viewModel);
+
+        viewModel.setModel(new MainModel(this,viewModel));
 
         int graphArray[] = new int[256];
         for(int i = 0; i < graphArray.length; ++i) {
@@ -66,7 +69,12 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
             value -> {
                 binding.graph.addValue(safeLongToInt(value));
                 binding.graph.invalidate();
-                binding.soundEnergy.setText(getString(R.string.sound_energy_lvl) + ": " + String.valueOf(value));
+                binding.soundEnergy.setText(
+                    String.format(
+                        getString(R.string.sound_energy_lvl),
+                        String.valueOf(value)
+                    )
+                );
             }
         );
     }
@@ -78,6 +86,11 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
     @Override
     public LifecycleOwner getOwner() {
         return this;
+    }
+
+    @Override
+    public Adapter adapter() {
+        return rowsAdapter;
     }
 
 
@@ -141,5 +154,4 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
         }
     }
 
-    public native String stringFromJNI();
 }
