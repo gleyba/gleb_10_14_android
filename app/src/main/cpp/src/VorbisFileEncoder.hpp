@@ -2,6 +2,7 @@
 
 #include <string>
 #include <vorbis/vorbisenc.h>
+#include <functional>
 #include <iostream>
 #include <fstream>
 
@@ -25,6 +26,8 @@ class VorbisFileEncoder final {
     vorbis_dsp_state vd; /* central working state for the packet->PCM decoder */
     vorbis_block     vb; /* local working space for packet->PCM decode */
 
+    std::function<void(long)> _soundEnergyLevelListener;
+
 public:
 
     VorbisFileEncoder(
@@ -35,8 +38,11 @@ public:
     );
 
     bool initialize();
-    void deInitialize();
+
+    void setSoundEnergyLevelListener(std::function<void(long)> listener);
     void writePcm(const char* buffer, long size);
+
+    void deInitialize();
 
     ~VorbisFileEncoder();
 

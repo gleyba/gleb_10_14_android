@@ -13,9 +13,14 @@ public class AudioRecorderTask extends AsyncTask<Void,Void,Void> {
     private static final String TAG = "AudioRecorderTask";
     private static final int SampleRate = 44100;
     private static final int Channels = 2;
+    private static final int ChannelConfiguration
+        = Channels == 1
+            ? AudioFormat.CHANNEL_IN_MONO
+            : AudioFormat.CHANNEL_IN_STEREO;
+
     private static final int BufferSize = AudioRecord.getMinBufferSize(
         SampleRate,
-        Channels,
+        ChannelConfiguration,
         AudioFormat.ENCODING_PCM_16BIT
     );
     private static float Quality = 1;
@@ -26,7 +31,7 @@ public class AudioRecorderTask extends AsyncTask<Void,Void,Void> {
     private final AudioRecord audioRecorder = new AudioRecord(
         MediaRecorder.AudioSource.MIC,
         SampleRate,
-        Channels,
+        ChannelConfiguration,
         AudioFormat.ENCODING_PCM_16BIT,
         BufferSize
     );

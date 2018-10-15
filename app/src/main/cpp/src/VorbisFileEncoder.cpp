@@ -87,6 +87,10 @@ bool VorbisFileEncoder::initialize() {
     return true;
 }
 
+void VorbisFileEncoder::setSoundEnergyLevelListener(std::function<void(long)> listener) {
+    _soundEnergyLevelListener = listener;
+}
+
 void VorbisFileEncoder::writePcm(const char* readbuffer, long size) {
     long i;
     /* data to encode */
@@ -100,6 +104,10 @@ void VorbisFileEncoder::writePcm(const char* readbuffer, long size) {
         for(channel = 0; channel < _channels; channel++) {
             buffer[channel][i]=((readbuffer[i*(2*_channels)+(channel*2+1)]<<8)|
                                 (0x00ff&(int)readbuffer[i*(2*_channels)+(channel*2)]))/32768.f;
+        }
+
+        if (_soundEnergyLevelListener) {
+
         }
     }
 
