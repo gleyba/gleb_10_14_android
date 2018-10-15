@@ -87,7 +87,67 @@ bool VorbisFileEncoder::initialize() {
     return true;
 }
 
+void VorbisFileEncoder::writePcm(const char* readbuffer, long size) {
+    long i;
+    /* data to encode */
+
+    /* expose the buffer to submit data */
+    float **buffer=vorbis_analysis_buffer(&vd,size/(2*_channels));
+
+    /* uninterleave samples */
+    int channel;
+    for(i=0;i<size/(2*_channels);i++) {
+        for(channel = 0; channel < _channels; channel++) {
+            buffer[channel][i]=((readbuffer[i*(2*_channels)+(channel*2+1)]<<8)|
+                                (0x00ff&(int)readbuffer[i*(2*_channels)+(channel*2)]))/32768.f;
+        }
+    }
+
+    /* tell the library how much we actually submitted */
+    vorbis_analysis_wrote(&vd,i);
+
+    int eos=0;
+    /* vorbis does some data preanalysis, then divvies up blocks for
+         more involved (potentially parallel) processing.  Get a single
+         block for encoding now */
+    while(vorbis_analysis_blockout(&vd,&vb)==1){
+
+        /* analysis, assume we want to use bitrate management */
+        vorbis_analysis(&vb,NULL);
+        vorbis_bitrate_addblock(&vb);
+
+        while(vorbis_bitrate_flushpacket(&vd,&op)){
+
+            /* weld the packet into the bitstream */
+            ogg_stream_packetin(&os,&op);
+
+            /* write out pages (if any) */
+            while(!eos){
+                int result=ogg_stream_pageout(&os,&og);
+                if(result==0)
+                    break;
+
+                _file.write((const char*) og.header, og.header_len);
+                _file.write((const char*) og.body, og.body_len);
+
+                /* this could be set above, but for illustrative purposes, I do
+                   it here (to show that vorbis does know where the stream ends) */
+
+                if(ogg_page_eos(&og))
+                    eos=1;
+            }
+        }
+    }
+}
+
 void VorbisFileEncoder::deInitialize() {
+
+    /* end of file.  this can be done implicitly in the mainline,
+           but it's easier to see here in non-clever fashion.
+           Tell the library we're at end of stream so that it can handle
+           the last frame and mark end of stream in the output properly */
+    logstr("VorbisEncoder : End of file");
+    vorbis_analysis_wrote(&vd,0);
     if (_file.is_open()) {
         _file.close();
     }

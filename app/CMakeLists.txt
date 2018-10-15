@@ -31,7 +31,11 @@ find_library(
     log
 )
 
+set(LibsPath ${CMAKE_CURRENT_SOURCE_DIR}/libs/${ANDROID_ABI})
+
 target_link_libraries(
     native-lib
     ${log-lib}
+    ${LibsPath}/libogg.so
+    ${LibsPath}/libvorbis.so
 )

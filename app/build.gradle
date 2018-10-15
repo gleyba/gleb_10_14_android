@@ -29,6 +29,11 @@ android {
             path "CMakeLists.txt"
         }
     }
+    sourceSets {
+        main {
+            jniLibs.srcDirs = ['libs']
+        }
+    }
     buildTypes {
         debug {
             debuggable true

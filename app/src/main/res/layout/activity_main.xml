@@ -24,7 +24,7 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:text="@{viewmodel.startButtonCaption}"
-            android:onClick="@{viewmodel.startOrStopRecord}"
+            android:onClick="@{() -> viewmodel.startOrStopRecord()}"
             android:enabled="@{!viewmodel.processing}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

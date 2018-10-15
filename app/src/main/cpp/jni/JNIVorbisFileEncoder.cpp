@@ -36,3 +36,15 @@ Java_test_gleb_110_114_1android_cppiface_VorbisFileEncoder_nativeDeIitialize(
 ) {
     getRef<VorbisFileEncoder>(ref)->deInitialize();
 }
+
+CJNICALL(void)
+Java_test_gleb_110_114_1android_cppiface_VorbisFileEncoder_nativeWritePCM(
+    JNIEnv *env,
+    jclass type,
+    jlong ref,
+    jbyteArray data_,
+    jlong size
+) {
+    JNIByteArray ba{env,data_};
+    getRef<VorbisFileEncoder>(ref)->writePcm((const char*)ba.data(),size);
+}

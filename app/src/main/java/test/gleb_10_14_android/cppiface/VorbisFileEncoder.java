@@ -12,6 +12,7 @@ public final class VorbisFileEncoder {
 
     private static native boolean nativeInitialize(long ref);
     private static native void nativeDeInitialize(long ref);
+    private static native void nativeWritePCM(long ref, byte[] data, long size);
 
     public VorbisFileEncoder(
         String fileName,
@@ -33,5 +34,9 @@ public final class VorbisFileEncoder {
 
     public void deInitialize() {
         nativeDeInitialize(ref.cRef);
+    }
+
+    public void writePCM(byte[] data, long size) {
+        nativeWritePCM(ref.cRef,data, size);
     }
 }

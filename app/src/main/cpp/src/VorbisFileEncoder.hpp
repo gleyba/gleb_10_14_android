@@ -36,6 +36,7 @@ public:
 
     bool initialize();
     void deInitialize();
+    void writePcm(const char* buffer, long size);
 
     ~VorbisFileEncoder();
 
