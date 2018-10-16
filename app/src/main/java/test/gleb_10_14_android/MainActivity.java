@@ -61,7 +61,6 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
 
     @Override
     public void start(LiveData<Long> soundEnergy) {
-        binding.soundEnergy.setText("");
         binding.graph.flush();
         binding.graph.invalidate();
         soundEnergy.observe(
@@ -77,10 +76,13 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
                 );
             }
         );
+
+        binding.startStopBtn.setBackgroundResource(R.drawable.stop);
     }
 
     @Override
     public void stop() {
+        binding.startStopBtn.setBackgroundResource(R.drawable.record);
     }
 
     @Override

@@ -4,5 +4,5 @@
     <string name="stop_record">Stop Record</string>
     <string name="stop_playing">Stop Playing</string>
     <string name="permissions_denied">Permissions Denied</string>
-    <string name="sound_energy_lvl">Sound Energy Level: %1$s</string>
+    <string name="sound_energy_lvl">"Sound Energy Level: %1$s</string>
 </resources>

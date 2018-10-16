@@ -1,45 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:card_view="http://schemas.android.com/tools">
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:card_view="http://schemas.android.com/tools">
 
-    <!--<android.support.v7.widget.CardView-->
-        <!--style="@style/MyCardViewStyle"-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"
+        android:paddingBottom="8dp">
+
+        <android.support.v7.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="36dp"
+            android:layout_gravity="center"
+            android:orientation="vertical"
+            app:cardBackgroundColor="@color/LightGrey"
+            card_view:cardCornerRadius="4dp">
+
+            <TextView
+                android:id="@+id/rowText"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="test"
+                android:textColor="@color/colorPrimaryDark"
+                android:gravity="center_vertical"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                android:textStyle="bold"
+                android:layout_marginLeft="8dp"/>
+        </android.support.v7.widget.CardView>
+
+    </LinearLayout>
+    <!--<LinearLayout-->
         <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="48dp"-->
-        <!--android:layout_gravity="center"-->
-        <!--android:orientation="vertical"-->
-        <!--app:cardBackgroundColor="?attr/colorPrimary"-->
-        <!--card_view:cardCornerRadius="4dp">-->
+        <!--android:layout_height="36dp">-->
 
         <!--<TextView-->
             <!--android:id="@+id/rowText"-->
             <!--android:layout_width="match_parent"-->
             <!--android:layout_height="match_parent"-->
-            <!--android:ellipsize="end"-->
+            <!--android:layout_marginStart="8dp"-->
+            <!--android:layout_marginEnd="8dp"-->
+            <!--android:text=""-->
             <!--android:maxLines="1"-->
-            <!--android:text="test"-->
-            <!--android:textAppearance="@style/TextAppearance.AppCompat.Large"-->
-            <!--android:textColor="@android:color/background_light"-->
-            <!--android:textStyle="bold"-->
-            <!--card_view:text="dasdsasad"/>-->
-    <!--</android.support.v7.widget.CardView>-->
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="36dp">
-
-        <TextView
-            android:id="@+id/rowText"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginStart="8dp"
-            android:layout_marginEnd="8dp"
-            android:text=""
-            android:maxLines="1"
-            android:ellipsize="end"
-            android:textAppearance="?android:attr/textAppearanceLarge"/>
-
-    </LinearLayout>
+            <!--android:ellipsize="end"-->
+            <!--android:textAppearance="?android:attr/textAppearanceLarge"/>-->
+    <!--</LinearLayout>-->
 
 </layout>

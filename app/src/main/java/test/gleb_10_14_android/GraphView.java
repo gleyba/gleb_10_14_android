@@ -5,11 +5,12 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.util.AttributeSet;
-import android.view.View;
+import android.view.ViewGroup;
 
 import android.graphics.Canvas;
+import android.widget.TextView;
 
-public class GraphView extends View {
+public class GraphView extends ViewGroup {
 
     private final static int Size = 64;
 
@@ -45,6 +46,12 @@ public class GraphView extends View {
         paint.setStyle(Paint.Style.STROKE);
 
         path = new Path();
+
+    }
+
+    @Override
+    protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
+
     }
 
     public void addValue(int value) {
@@ -70,7 +77,7 @@ public class GraphView extends View {
     public void flush() {
         endPos = 0;
         startPos = 0;
-        minY = 0;
+        minY = Integer.MAX_VALUE;
         maxY = 0;
     }
 
@@ -84,8 +91,11 @@ public class GraphView extends View {
 
         path.reset();
 
-        float factorX = getWidth() / (float)Size;
-        float factorY = getHeight() / (float)maxY;
+        int width = getWidth();
+        int height = getHeight();
+
+        float factorX = width / (float)Size;
+        float factorY = height / (float)(maxY - minY);
 
         int curPos = startPos;
 
