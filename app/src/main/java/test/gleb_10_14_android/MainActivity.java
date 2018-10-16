@@ -2,12 +2,16 @@ package test.gleb_10_14_android;
 
 import android.arch.lifecycle.LifecycleOwner;
 import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.MutableLiveData;
 import android.content.pm.PackageManager;
 import android.databinding.DataBindingUtil;
 import android.os.Build;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.widget.Toast;
 
 import static android.Manifest.permission.RECORD_AUDIO;
@@ -153,6 +157,34 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
         } else {
             onPermissionsGrantedRunnable = r;
             requestPermissions();
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main, menu);
+        return true;
+    }
+
+   private final MutableLiveData<Void> flushEvent = new MutableLiveData<Void>();
+
+    @Override
+    public LiveData<Void> onFlush() {
+        return flushEvent;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.reload:
+                rowsAdapter.flush();
+                flushEvent.postValue(null);
+                return true;
+
+            default:
+                return false;
+
         }
     }
 

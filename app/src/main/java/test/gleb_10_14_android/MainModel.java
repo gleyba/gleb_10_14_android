@@ -22,6 +22,17 @@ public class MainModel implements MainContract.Model {
     ) {
         this.ctx = ctx;
         this.viewModel = viewModel;
+
+        viewModel.onFlush().observe(
+            viewModel.getOwner(),
+            x -> {
+                for(File file : ctx.getFilesDir().listFiles()) {
+                    if (file.getName().endsWith((".ogg"))) {
+                        file.delete();
+                    }
+                }
+            }
+        );
     }
 
     AudioRecorderTask recorderTask = null;

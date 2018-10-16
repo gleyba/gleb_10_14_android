@@ -1,5 +1,6 @@
 package test.gleb_10_14_android;
 
+import android.arch.lifecycle.LifecycleOwner;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.content.Context;
@@ -47,6 +48,7 @@ implements MainContract.ViewModel {
             }
         );
         state.postValue(State.None);
+
     }
 
     private MainContract.Model model = null;
@@ -88,5 +90,15 @@ implements MainContract.ViewModel {
                     break;
             }
         });
+    }
+
+    @Override
+    public LifecycleOwner getOwner() {
+        return view.getOwner();
+    }
+
+    @Override
+    public LiveData<Void> onFlush() {
+        return view.onFlush();
     }
 }

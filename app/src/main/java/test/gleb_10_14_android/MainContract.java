@@ -20,10 +20,13 @@ public interface MainContract {
         }
 
         Adapter adapter();
+
+        LiveData<Void> onFlush();
     }
 
     interface ViewModel {
-
+        LifecycleOwner getOwner();
+        LiveData<Void> onFlush();
     }
 
     interface Model {

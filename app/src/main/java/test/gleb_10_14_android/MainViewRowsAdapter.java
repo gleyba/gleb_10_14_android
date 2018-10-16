@@ -64,4 +64,9 @@ implements MainContract.View.Adapter
             binding = DataBindingUtil.bind(itemView);
         }
     }
+
+    public void flush() {
+        items.clear();
+        notifyDataSetChanged();
+    }
 }
