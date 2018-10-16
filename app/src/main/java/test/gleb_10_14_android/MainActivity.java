@@ -5,10 +5,13 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.content.pm.PackageManager;
 import android.databinding.DataBindingUtil;
+import android.graphics.Canvas;
 import android.os.Build;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -30,11 +33,13 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
 
     private ActivityMainBinding binding;
     private MainViewRowsAdapter rowsAdapter;
+    private SwipeController swipeController;
+
+    private MenuItem reloadItem;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
 
         MainViewModel viewModel = new MainViewModel(this,this);
 
@@ -48,10 +53,29 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
 
         viewModel.setModel(new MainModel(this,viewModel));
 
-        int graphArray[] = new int[256];
-        for(int i = 0; i < graphArray.length; ++i) {
-            graphArray[i] = i % 50;
-        }
+        swipeController = new SwipeController(this,new SwipeControllerActions() {
+            @Override
+            public void onRightClicked(int position) {
+//                mAdapter.players.remove(position);
+//                mAdapter.notifyItemRemoved(position);
+//                mAdapter.notifyItemRangeChanged(position, mAdapter.getItemCount());
+            }
+
+            @Override
+            public void onLeftClicked(int position) {
+
+            }
+        });
+
+        ItemTouchHelper itemTouchhelper = new ItemTouchHelper(swipeController);
+        itemTouchhelper.attachToRecyclerView(binding.recycler);
+
+        binding.recycler.addItemDecoration(new RecyclerView.ItemDecoration() {
+            @Override
+            public void onDraw(Canvas c, RecyclerView parent, RecyclerView.State state) {
+                swipeController.onDraw(c);
+            }
+        });
 
     }
 
@@ -81,11 +105,13 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
             }
         );
 
+        reloadItem.setVisible(false);
         binding.startStopBtn.setBackgroundResource(R.drawable.stop);
     }
 
     @Override
     public void stop() {
+        reloadItem.setVisible(true);
         binding.startStopBtn.setBackgroundResource(R.drawable.record);
     }
 
@@ -164,6 +190,8 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.main, menu);
+
+        reloadItem = menu.findItem(R.id.reload);
         return true;
     }
 
