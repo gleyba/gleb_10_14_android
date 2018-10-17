@@ -4,26 +4,14 @@ import android.arch.lifecycle.LiveData;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
-import android.os.AsyncTask;
 import android.util.Log;
 
 import test.gleb_10_14_android.cppiface.VorbisFileEncoder;
 
-public class AudioRecorderTask extends AsyncTask<Void,Void,Void> {
+public class AudioRecorderTask extends AudioTaskBase {
 
     private static final String TAG = "AudioRecorderTask";
-    private static final int SampleRate = 16000;
-    private static final int Channels = 1;
-    private static final int ChannelConfiguration
-        = Channels == 1
-            ? AudioFormat.CHANNEL_IN_MONO
-            : AudioFormat.CHANNEL_IN_STEREO;
 
-    private static final int BufferSize = AudioRecord.getMinBufferSize(
-        SampleRate,
-        ChannelConfiguration,
-        AudioFormat.ENCODING_PCM_16BIT
-    );
     private static float Quality = 1;
     private static int ReadSize = 1024;
 
@@ -57,6 +45,7 @@ public class AudioRecorderTask extends AsyncTask<Void,Void,Void> {
         return fileName;
     }
 
+    @Override
     public LiveData<Long> soundEnergy() {
         return encoder.soundEnergy();
     }

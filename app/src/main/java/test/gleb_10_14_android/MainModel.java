@@ -22,7 +22,7 @@ public class MainModel implements MainContract.Model {
         this.viewModel = viewModel;
     }
 
-    AudioRecorderTask recorderTask = null;
+    private AudioRecorderTask recorderTask = null;
     @Override
     public LiveData<Long> startRecord() {
         recorderTask = new AudioRecorderTask(
@@ -33,9 +33,15 @@ public class MainModel implements MainContract.Model {
         return recorderTask.soundEnergy();
     }
 
+    private AudioPlayerTask playerTask = null;
     @Override
     public LiveData<Long> startPlaying(String fileName) {
-        return null;
+        playerTask = new AudioPlayerTask(
+            ctx.getFilesDir().toString(),
+            fileName
+        );
+        playerTask.execute();
+        return playerTask.soundEnergy();
     }
 
     MutableLiveData<String> onNewOggFile = new MutableLiveData<>();
@@ -51,6 +57,10 @@ public class MainModel implements MainContract.Model {
             recorderTask.cancel(false);
             onNewOggFile.postValue(recorderTask.getFileName());
             recorderTask = null;
+        }
+        if (playerTask != null) {
+            playerTask.cancel(false);
+            playerTask = null;
         }
     }
 
