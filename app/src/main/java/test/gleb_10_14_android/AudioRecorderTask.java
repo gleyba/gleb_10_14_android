@@ -16,6 +16,17 @@ public class AudioRecorderTask extends AudioTaskBase {
 
     private byte[] pcmDataBuffer = new byte[BufferSize];
 
+    static final int ChannelConfiguration
+        = Channels == 1
+            ? AudioFormat.CHANNEL_IN_MONO
+            : AudioFormat.CHANNEL_IN_STEREO;
+
+    static final int BufferMinSize = AudioRecord.getMinBufferSize(
+        SampleRate,
+        ChannelConfiguration,
+        AudioFormat.ENCODING_PCM_16BIT
+    );
+
     private final AudioRecord audioRecorder = new AudioRecord(
         MediaRecorder.AudioSource.MIC,
         SampleRate,

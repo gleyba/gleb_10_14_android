@@ -12,6 +12,18 @@ public class AudioPlayerTask extends AudioTaskBase {
 
     private short[] pcmDataBuffer = new short[BufferSize];
 
+    static final int ChannelConfiguration
+        = Channels == 1
+            ? AudioFormat.CHANNEL_OUT_MONO
+            : AudioFormat.CHANNEL_OUT_STEREO;
+
+    static final int BufferMinSize = AudioTrack.getMinBufferSize(
+        SampleRate,
+        ChannelConfiguration,
+        AudioFormat.ENCODING_PCM_16BIT
+    );
+
+
     private AudioTrack audioTrack = new AudioTrack(
         AudioManager.STREAM_MUSIC,
         SampleRate,

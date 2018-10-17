@@ -13,7 +13,7 @@ VorbisFileEncoder::VorbisFileEncoder(
     long sampleRate,
     float quality
 )
-: _file{std::move(fileName)}
+: _file{std::move(fileName),std::ofstream::out}
 , _channels{channels}
 , _sampleRate{sampleRate}
 , _quality{quality}
@@ -111,7 +111,7 @@ void VorbisFileEncoder::writePcm(const char* readbuffer, long size) {
     if (_soundEnergyLevelListener) {
         long sumOfSampleSquares = 0;
         for(i=0;i<size;i++) {
-            long sample = readbuffer[i];
+            long sample = readbuffer[i] + (readbuffer[++i]<<8);
             sumOfSampleSquares += sample * sample;
         }
         long soundEnergy = sumOfSampleSquares/size;
