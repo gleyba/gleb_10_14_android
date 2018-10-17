@@ -42,58 +42,77 @@
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/recycler"
+            android:weightSum="5"
             android:background="@color/colorPrimary">
 
-            <LinearLayout
+
+            <RelativeLayout
                 android:orientation="vertical"
                 android:layout_height="match_parent"
-                android:layout_width="wrap_content">
+                android:layout_width="0dp"
+                android:layout_weight="4">
 
-                <TextView
-                    android:id="@+id/btnCaption"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@{viewmodel.startButtonCaption}"
-                    android:textColor="@color/LightGrey"
-                    android:layout_gravity="center"
-                    android:layout_marginTop="8dp"
-                    android:textAppearance="@style/Widget.AppCompat.Button.Small"/>
-
-                <Button
-                    android:id="@+id/startStopBtn"
-                    android:layout_width="48dp"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/record"
-                    android:layout_gravity="center_vertical"
-                    android:layout_margin="8dp"
-                    android:onClick="@{() -> viewmodel.startOrStopRecord()}"/>
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:orientation="vertical"
-                android:layout_height="match_parent"
-                android:layout_width="match_parent">
-
-                <TextView
-                    android:id="@+id/soundEnergy"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/LightGrey"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                    android:layout_marginStart="4dp"/>
-
-                <test.gleb_10_14_android.GraphView
-                    android:id="@+id/graph"
+                <LinearLayout
+                    android:orientation="vertical"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="@color/colorPrimary">
+                    android:layout_height="match_parent">
 
-                </test.gleb_10_14_android.GraphView>
-            </LinearLayout>
+                    <TextView
+                        android:id="@+id/soundEnergy"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/LightGrey"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                        android:layout_marginStart="4dp"/>
+
+                    <test.gleb_10_14_android.GraphView
+                        android:id="@+id/graph"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@color/colorPrimary">
+
+                    </test.gleb_10_14_android.GraphView>
+
+                </LinearLayout>
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_height="match_parent"
+                android:layout_width="0dp"
+                android:layout_weight="1">
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <TextView
+                        android:id="@+id/btnCaption"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@{viewmodel.startButtonCaption}"
+                        android:textColor="@color/LightGrey"
+                        android:layout_gravity="center"
+                        android:layout_marginTop="8dp"
+                        android:textAppearance="@style/Widget.AppCompat.Button.Small"/>
+
+                    <Button
+                        android:id="@+id/startStopBtn"
+                        android:layout_width="48dp"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/record"
+                        android:layout_gravity="center"
+                        android:layout_margin="8dp"
+                        android:onClick="@{() -> viewmodel.startOrStopRecord()}"/>
+
+                </LinearLayout>
+
+
+
+            </RelativeLayout>
         </LinearLayout>
 
-
-
     </android.support.constraint.ConstraintLayout>
+
 </layout>

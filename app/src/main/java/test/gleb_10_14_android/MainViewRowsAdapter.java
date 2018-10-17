@@ -65,8 +65,17 @@ implements MainContract.View.Adapter
         }
     }
 
+    public String itemData(int position) {
+        return items.get(position);
+    }
+
     public void flush() {
         items.clear();
         notifyDataSetChanged();
+    }
+
+    public void deleteItem(int position) {
+        items.remove(position);
+        notifyItemRemoved(position);
     }
 }

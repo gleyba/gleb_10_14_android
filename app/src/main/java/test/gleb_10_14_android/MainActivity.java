@@ -37,6 +37,22 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
 
     private MenuItem reloadItem;
 
+    private final MutableLiveData<Void> flushEvent = new MutableLiveData<>();
+    @Override
+    public LiveData<Void> onFlush() {
+        return flushEvent;
+    }
+    private final MutableLiveData<String> removeFileEvent = new MutableLiveData<>();
+    @Override
+    public LiveData<String> onRemove() {
+        return removeFileEvent;
+    }
+    private final MutableLiveData<String> playFileEvent = new MutableLiveData<>();
+    @Override
+    public LiveData<String> onPlay() {
+        return playFileEvent;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,14 +72,13 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
         swipeController = new SwipeController(this,new SwipeControllerActions() {
             @Override
             public void onRightClicked(int position) {
-//                mAdapter.players.remove(position);
-//                mAdapter.notifyItemRemoved(position);
-//                mAdapter.notifyItemRangeChanged(position, mAdapter.getItemCount());
+                removeFileEvent.postValue(rowsAdapter.itemData(position));
+                rowsAdapter.deleteItem(position);
             }
 
             @Override
             public void onLeftClicked(int position) {
-
+                playFileEvent.postValue(rowsAdapter.itemData(position));
             }
         });
 
@@ -89,6 +104,7 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
 
     @Override
     public void start(LiveData<Long> soundEnergy) {
+        binding.soundEnergy.setText(null);
         binding.graph.flush();
         binding.graph.invalidate();
         soundEnergy.observe(
@@ -195,13 +211,6 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
         return true;
     }
 
-   private final MutableLiveData<Void> flushEvent = new MutableLiveData<Void>();
-
-    @Override
-    public LiveData<Void> onFlush() {
-        return flushEvent;
-    }
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -215,5 +224,7 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
 
         }
     }
+
+
 
 }

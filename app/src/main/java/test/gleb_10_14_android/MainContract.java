@@ -22,11 +22,17 @@ public interface MainContract {
         Adapter adapter();
 
         LiveData<Void> onFlush();
+
+        LiveData<String> onRemove();
+        LiveData<String> onPlay();
     }
 
     interface ViewModel {
         LifecycleOwner getOwner();
         LiveData<Void> onFlush();
+
+        LiveData<String> onRemove();
+        LiveData<String> onPlay();
     }
 
     interface Model {

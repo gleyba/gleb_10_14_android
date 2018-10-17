@@ -5,9 +5,7 @@ import android.arch.lifecycle.MutableLiveData;
 import android.content.Context;
 
 import java.io.File;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Random;
 
 import test.gleb_10_14_android.utility.RandomString;
 
@@ -31,6 +29,18 @@ public class MainModel implements MainContract.Model {
                         file.delete();
                     }
                 }
+            }
+        );
+        viewModel.onRemove().observe(
+            viewModel.getOwner(),
+            fileName -> {
+                new File(ctx.getFilesDir() + "/" + fileName).delete();
+            }
+        );
+        viewModel.onFlush().observe(
+            viewModel.getOwner(),
+            fileName -> {
+
             }
         );
     }

@@ -101,4 +101,13 @@ implements MainContract.ViewModel {
     public LiveData<Void> onFlush() {
         return view.onFlush();
     }
+    @Override
+    public LiveData<String> onRemove() {
+        return view.onRemove();
+    }
+    private final MutableLiveData<String> playFileEvent = new MutableLiveData<>();
+    @Override
+    public LiveData<String> onPlay() {
+        return view.onPlay();
+    }
 }
