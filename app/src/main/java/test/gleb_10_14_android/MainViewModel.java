@@ -1,13 +1,10 @@
 package test.gleb_10_14_android;
 
-import android.arch.lifecycle.LifecycleOwner;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.content.Context;
 import android.databinding.BaseObservable;
 import android.databinding.ObservableField;
-
-import java.nio.charset.Charset;
 
 public class MainViewModel
 extends BaseObservable
@@ -37,12 +34,15 @@ implements MainContract.ViewModel {
                 switch (value) {
                     case None:
                         startButtonCaption.set(ctx.getString(R.string.start_record));
+                        notProcessing.set(true);
                         break;
                     case Playing:
                         startButtonCaption.set(ctx.getString(R.string.stop_playing));
+                        notProcessing.set(false);
                         break;
                     case Recording:
                         startButtonCaption.set(ctx.getString(R.string.stop_record));
+                        notProcessing.set(false);
                         break;
                 }
             }
@@ -59,55 +59,43 @@ implements MainContract.ViewModel {
             view.getOwner(),
             view.adapter()::addItem
         );
+
+        view.onFlush().observe(
+            view.getOwner(),
+            x -> model.removeAllFiles()
+        );
+        view.onRemove().observe(
+            view.getOwner(),
+            model::removeFile
+        );
+        view.onPlay().observe(
+            view.getOwner(),
+            fileName -> {
+                view.start(model.startPlaying(fileName));
+                state.postValue(State.Playing);
+            }
+        );
     }
 
     public void startOrStopRecord() {
         view.withPermissionsChecked(() -> {
             switch (state.getValue()) {
                 case None:
-
-                    LiveData<Long> soundLevel = model.startRecord();
-
-                    if (soundLevel == null) {
-                        break;
-                    }
-
-                    view.start(soundLevel);
+                    view.start(model.startRecord());
                     state.postValue(State.Recording);
-                    notProcessing.set(false);
                     break;
                 case Playing:
                     model.stop();
                     view.stop();
                     state.postValue(State.None);
-                    notProcessing.set(true);
                     break;
                 case Recording:
                     model.stop();
                     view.stop();
                     state.postValue(State.None);
-                    notProcessing.set(true);
                     break;
             }
         });
     }
 
-    @Override
-    public LifecycleOwner getOwner() {
-        return view.getOwner();
-    }
-
-    @Override
-    public LiveData<Void> onFlush() {
-        return view.onFlush();
-    }
-    @Override
-    public LiveData<String> onRemove() {
-        return view.onRemove();
-    }
-    private final MutableLiveData<String> playFileEvent = new MutableLiveData<>();
-    @Override
-    public LiveData<String> onPlay() {
-        return view.onPlay();
-    }
 }

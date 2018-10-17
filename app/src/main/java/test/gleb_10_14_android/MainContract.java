@@ -28,17 +28,15 @@ public interface MainContract {
     }
 
     interface ViewModel {
-        LifecycleOwner getOwner();
-        LiveData<Void> onFlush();
-
-        LiveData<String> onRemove();
-        LiveData<String> onPlay();
     }
 
     interface Model {
         ArrayList<String> getAllOggFiles();
         LiveData<String> newOggFile();
         LiveData<Long> startRecord();
+        LiveData<Long> startPlaying(String fileName);
         void stop();
+        void removeFile(String fileName);
+        void removeAllFiles();
     }
 }

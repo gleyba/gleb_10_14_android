@@ -20,29 +20,6 @@ public class MainModel implements MainContract.Model {
     ) {
         this.ctx = ctx;
         this.viewModel = viewModel;
-
-        viewModel.onFlush().observe(
-            viewModel.getOwner(),
-            x -> {
-                for(File file : ctx.getFilesDir().listFiles()) {
-                    if (file.getName().endsWith((".ogg"))) {
-                        file.delete();
-                    }
-                }
-            }
-        );
-        viewModel.onRemove().observe(
-            viewModel.getOwner(),
-            fileName -> {
-                new File(ctx.getFilesDir() + "/" + fileName).delete();
-            }
-        );
-        viewModel.onFlush().observe(
-            viewModel.getOwner(),
-            fileName -> {
-
-            }
-        );
     }
 
     AudioRecorderTask recorderTask = null;
@@ -54,6 +31,11 @@ public class MainModel implements MainContract.Model {
         );
         recorderTask.execute();
         return recorderTask.soundEnergy();
+    }
+
+    @Override
+    public LiveData<Long> startPlaying(String fileName) {
+        return null;
     }
 
     MutableLiveData<String> onNewOggFile = new MutableLiveData<>();
@@ -83,5 +65,19 @@ public class MainModel implements MainContract.Model {
         }
 
         return result;
+    }
+
+    @Override
+    public void removeFile(String fileName) {
+        new File(ctx.getFilesDir() + "/" + fileName).delete();
+    }
+
+    @Override
+    public void removeAllFiles() {
+        for(File file : ctx.getFilesDir().listFiles()) {
+            if (file.getName().endsWith((".ogg"))) {
+                file.delete();
+            }
+        }
     }
 }
