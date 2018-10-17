@@ -12,17 +12,16 @@ public class AudioRecorderTask extends AudioTaskBase {
 
     private static final String TAG = "AudioRecorderTask";
 
-    private static float Quality = 1;
-    private static int ReadSize = 1024;
+    private static float Quality = 1;;
 
-    private byte[] pcmDataBuffer = new byte[ReadSize * 4];
+    private byte[] pcmDataBuffer = new byte[BufferSize];
 
     private final AudioRecord audioRecorder = new AudioRecord(
         MediaRecorder.AudioSource.MIC,
         SampleRate,
         ChannelConfiguration,
         AudioFormat.ENCODING_PCM_16BIT,
-        BufferSize
+        BufferMinSize
     );
 
     private final String fileName;
@@ -60,7 +59,7 @@ public class AudioRecorderTask extends AudioTaskBase {
     @Override
     protected Void doInBackground(Void... voids) {
         while(!isCancelled()) {
-            int read = audioRecorder.read(pcmDataBuffer, 0, ReadSize * 4);
+            int read = audioRecorder.read(pcmDataBuffer, 0, BufferSize);
             switch (read) {
                 case AudioRecord.ERROR_INVALID_OPERATION:
                     Log.e(TAG, "Invalid operation on AudioRecord object");

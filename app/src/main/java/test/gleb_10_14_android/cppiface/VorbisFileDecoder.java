@@ -3,16 +3,14 @@ package test.gleb_10_14_android.cppiface;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 
-public final class VorbisFileEncoder {
-
+public class VorbisFileDecoder {
     private final NativeRef ref;
     private final MutableLiveData<Long> soundEnergyMutable = new MutableLiveData<>();
 
     private static native long create(
         String fileName,
         int channels,
-        int sampleRate,
-        float quality
+        int sampleRate
     );
 
     private static native boolean nativeInitialize(long ref);
@@ -23,23 +21,21 @@ public final class VorbisFileEncoder {
         SoundEnergyListener listener
     );
 
-    private static native void nativeWritePCM(
+    private static native int nativeReadPCM(
         long ref,
-        byte[] data,
-        long size
+        short[] data,
+        int size
     );
 
-    public VorbisFileEncoder(
+    public VorbisFileDecoder(
         String fileName,
         int channels,
-        int sampleRate,
-        float quality
+        int sampleRate
     ) {
         ref = new NativeRef(create(
             fileName,
             channels,
-            sampleRate,
-            quality
+            sampleRate
         ));
     }
 
@@ -63,11 +59,11 @@ public final class VorbisFileEncoder {
         nativeDeInitialize(ref.cRef);
     }
 
-    public void writePCM(
-        byte[] data,
-        long size
+    public int readPcm(
+        short[] data,
+        int size
     ) {
-        nativeWritePCM(
+        return nativeReadPCM(
             ref.cRef,
             data,
             size

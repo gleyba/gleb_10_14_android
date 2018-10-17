@@ -94,3 +94,16 @@ JNIByteArray::~JNIByteArray() {
     _env->ReleaseByteArrayElements(_jData,_data,0);
 }
 
+JNIShortArray::JNIShortArray(
+    JNIEnv* env,
+    jshortArray jData
+)
+: _env{env}
+, _jData{jData}
+, _data{env->GetShortArrayElements(jData, nullptr)}
+, _size{(size_t)_env->GetArrayLength(jData)}
+{}
+
+JNIShortArray::~JNIShortArray() {
+    _env->ReleaseShortArrayElements(_jData,_data,0);
+}

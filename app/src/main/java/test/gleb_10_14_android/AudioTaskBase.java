@@ -13,7 +13,9 @@ abstract class AudioTaskBase  extends AsyncTask<Void,Void,Void> {
             ? AudioFormat.CHANNEL_IN_MONO
             : AudioFormat.CHANNEL_IN_STEREO;
 
-    static final int BufferSize = AudioRecord.getMinBufferSize(
+    static int BufferSize = 1024 * 4;
+
+    static final int BufferMinSize = AudioRecord.getMinBufferSize(
         SampleRate,
         ChannelConfiguration,
         AudioFormat.ENCODING_PCM_16BIT

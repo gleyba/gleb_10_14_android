@@ -82,6 +82,28 @@ public:
 
 };
 
+class JNIShortArray {
+
+    JNIEnv* _env;
+    jshortArray _jData;
+    jshort* _data;
+    size_t _size;
+
+public:
+
+    JNIShortArray(
+        JNIEnv* env,
+        jshortArray jData
+    );
+
+    ~JNIShortArray();
+
+    const jshort* data() { return _data; }
+    size_t size() { return _size; }
+
+};
+
+
 class NativeRef {};
 template<typename T>
 class NativeRefHolder : public NativeRef{
