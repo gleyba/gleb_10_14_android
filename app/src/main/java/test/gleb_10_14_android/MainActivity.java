@@ -63,7 +63,7 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
             this,
             R.layout.activity_main
         );
-        rowsAdapter = new MainViewRowsAdapter();
+        rowsAdapter = new MainViewRowsAdapter(this);
         binding.recycler.setAdapter(rowsAdapter);
         binding.setViewmodel(viewModel);
 
@@ -79,6 +79,7 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
             @Override
             public void onLeftClicked(int position) {
                 playFileEvent.postValue(rowsAdapter.itemData(position));
+                rowsAdapter.setItemPlaing(position);
             }
         });
 
@@ -88,29 +89,21 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
         binding.recycler.addItemDecoration(new RecyclerView.ItemDecoration() {
             @Override
             public void onDraw(Canvas c, RecyclerView parent, RecyclerView.State state) {
-                swipeController.onDraw(c);
+            swipeController.onDraw(c);
             }
         });
 
     }
 
-    public static int safeLongToInt(long l) {
-        if (l < Integer.MIN_VALUE || l > Integer.MAX_VALUE) {
-            throw new IllegalArgumentException
-                    (l + " cannot be cast to int without changing its value.");
-        }
-        return (int) l;
-    }
-
     @Override
-    public void start(LiveData<Long> soundEnergy) {
+    public void start(AudioTaskEvents events) {
         binding.soundEnergy.setText(null);
         binding.graph.flush();
         binding.graph.invalidate();
-        soundEnergy.observe(
+        events.soundEnergy().observe(
             this,
             value -> {
-                binding.graph.addValue(safeLongToInt(value));
+                binding.graph.addValue(value);
                 binding.graph.invalidate();
                 binding.soundEnergy.setText(
                     String.format(
@@ -120,15 +113,17 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
                 );
             }
         );
+        events.stopped().observe(
+            this,
+            x -> {
+                reloadItem.setVisible(true);
+                binding.startStopBtn.setBackgroundResource(R.drawable.record);
+                rowsAdapter.setNoItemsPlaying();
+            }
+        );
 
         reloadItem.setVisible(false);
         binding.startStopBtn.setBackgroundResource(R.drawable.stop);
-    }
-
-    @Override
-    public void stop() {
-        reloadItem.setVisible(true);
-        binding.startStopBtn.setBackgroundResource(R.drawable.record);
     }
 
     @Override

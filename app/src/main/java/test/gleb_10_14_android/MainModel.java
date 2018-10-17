@@ -3,6 +3,8 @@ package test.gleb_10_14_android;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.content.Context;
+import android.os.Environment;
+import android.util.Log;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -10,9 +12,18 @@ import java.util.ArrayList;
 import test.gleb_10_14_android.utility.RandomString;
 
 public class MainModel implements MainContract.Model {
-
+    private static final String TAG = "MainModel";
     private Context ctx;
     private MainContract.ViewModel viewModel;
+
+    File filesDir() {
+//        File publicDir = new File(Environment.getExternalStorageDirectory() + "/oggfiles");
+//        if (!publicDir.exists()) {
+//            publicDir.mkdir();
+//        }
+//        return publicDir;
+        return ctx.getFilesDir();
+    }
 
     public MainModel(
         Context ctx,
@@ -24,24 +35,24 @@ public class MainModel implements MainContract.Model {
 
     private AudioRecorderTask recorderTask = null;
     @Override
-    public LiveData<Long> startRecord() {
+    public AudioTaskEvents startRecord() {
         recorderTask = new AudioRecorderTask(
-            ctx.getFilesDir().toString(),
+            filesDir().toString(),
             new RandomString(10).nextString() + ".ogg"
         );
         recorderTask.execute();
-        return recorderTask.soundEnergy();
+        return recorderTask;
     }
 
     private AudioPlayerTask playerTask = null;
     @Override
-    public LiveData<Long> startPlaying(String fileName) {
+    public AudioTaskEvents startPlaying(String fileName) {
         playerTask = new AudioPlayerTask(
-            ctx.getFilesDir().toString(),
+            filesDir().toString(),
             fileName
         );
         playerTask.execute();
-        return playerTask.soundEnergy();
+        return playerTask;
     }
 
     MutableLiveData<String> onNewOggFile = new MutableLiveData<>();
@@ -68,9 +79,11 @@ public class MainModel implements MainContract.Model {
     public ArrayList<String> getAllOggFiles() {
         ArrayList<String> result = new ArrayList<>();
 
-        for(File file : ctx.getFilesDir().listFiles()) {
+        for(File file : filesDir().listFiles()) {
             if (file.getName().endsWith((".ogg"))) {
                 result.add(file.getName());
+
+                Log.v(TAG,"Adding: " + file.getName() + " size: " + file.length());
             }
         }
 
@@ -79,12 +92,12 @@ public class MainModel implements MainContract.Model {
 
     @Override
     public void removeFile(String fileName) {
-        new File(ctx.getFilesDir() + "/" + fileName).delete();
+        new File(filesDir() + "/" + fileName).delete();
     }
 
     @Override
     public void removeAllFiles() {
-        for(File file : ctx.getFilesDir().listFiles()) {
+        for(File file : filesDir().listFiles()) {
             if (file.getName().endsWith((".ogg"))) {
                 file.delete();
             }

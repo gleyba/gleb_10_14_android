@@ -10,8 +10,7 @@ public interface MainContract {
     interface View {
         LifecycleOwner getOwner();
         void withPermissionsChecked(Runnable r);
-        void start(LiveData<Long> soundEnergy);
-        void stop();
+        void start(AudioTaskEvents events);
 
         interface Adapter {
 
@@ -33,8 +32,8 @@ public interface MainContract {
     interface Model {
         ArrayList<String> getAllOggFiles();
         LiveData<String> newOggFile();
-        LiveData<Long> startRecord();
-        LiveData<Long> startPlaying(String fileName);
+        AudioTaskEvents startRecord();
+        AudioTaskEvents startPlaying(String fileName);
         void stop();
         void removeFile(String fileName);
         void removeAllFiles();

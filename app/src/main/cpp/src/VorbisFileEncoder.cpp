@@ -87,7 +87,7 @@ bool VorbisFileEncoder::initialize() {
     return true;
 }
 
-void VorbisFileEncoder::setSoundEnergyLevelListener(std::function<void(long)> listener) {
+void VorbisFileEncoder::setSoundEnergyLevelListener(std::function<void(float)> listener) {
     _soundEnergyLevelListener = listener;
 }
 
@@ -96,31 +96,34 @@ void VorbisFileEncoder::writePcm(const char* readbuffer, long size) {
     long i;
     /* data to encode */
 
-    /* expose the buffer to submit data */
-    float **buffer=vorbis_analysis_buffer(&vd,size/(2*_channels));
+    if (size == 0) {
+        vorbis_analysis_wrote(&vd,0);
+    } else {
+        /* expose the buffer to submit data */
+        float **buffer=vorbis_analysis_buffer(&vd,size/(2*_channels));
 
-    /* uninterleave samples */
-    int channel;
-    for(i=0;i<size/(2*_channels);i++) {
-        for(channel = 0; channel < _channels; channel++) {
-            buffer[channel][i]=((readbuffer[i*(2*_channels)+(channel*2+1)]<<8)|
-                                (0x00ff&(int)readbuffer[i*(2*_channels)+(channel*2)]))/32768.f;
+        /* uninterleave samples */
+        int channel;
+        float sumOfSampleSquares = 0;
+        for(i=0;i<size/(2*_channels);i++) {
+            for(channel = 0; channel < _channels; channel++) {
+                int16_t low = readbuffer[i*(2*_channels)+(channel*2)];
+                int16_t high = readbuffer[i*(2*_channels)+(channel*2+1)]<<8;
+                int16_t sampleI = low|high;
+                float sampleF = sampleI/32768.f;
+                sumOfSampleSquares += sampleF * sampleF;
+                buffer[channel][i]=sampleF;
+            }
         }
-    }
 
-    if (_soundEnergyLevelListener) {
-        long sumOfSampleSquares = 0;
-        for(i=0;i<size;i++) {
-            long sample = readbuffer[i] + (readbuffer[++i]<<8);
-            sumOfSampleSquares += sample * sample;
+        if (_soundEnergyLevelListener) {
+            float result = sumOfSampleSquares/(float)size;
+            _soundEnergyLevelListener(result);
         }
-        long soundEnergy = sumOfSampleSquares/size;
-//        logstr("VorbisFileEncoder::writePcm sumOfSampleSquares:" + std::to_string(sumOfSampleSquares));
-        _soundEnergyLevelListener(soundEnergy);
-    }
 
-    /* tell the library how much we actually submitted */
-    vorbis_analysis_wrote(&vd,i);
+        /* tell the library how much we actually submitted */
+        vorbis_analysis_wrote(&vd,i);
+    }
 
     int eos=0;
     /* vorbis does some data preanalysis, then divvies up blocks for
@@ -157,6 +160,8 @@ void VorbisFileEncoder::writePcm(const char* readbuffer, long size) {
 }
 
 void VorbisFileEncoder::deInitialize() {
+
+    _soundEnergyLevelListener = nullptr;
 
     /* end of file.  this can be done implicitly in the mainline,
            but it's easier to see here in non-clever fashion.

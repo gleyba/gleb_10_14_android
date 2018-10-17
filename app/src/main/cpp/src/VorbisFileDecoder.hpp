@@ -27,11 +27,8 @@ class VorbisFileDecoder final {
     vorbis_dsp_state vd; /* central working state for the packet->PCM decoder */
     vorbis_block     vb; /* local working space for packet->PCM decode */
 
-    std::function<void(long)> _soundEnergyLevelListener;
+    std::function<void(float)> _soundEnergyLevelListener;
 
-    char * _buffer;
-
-    bool _isFirst = true;
     int _convSize = BUFFER_LENGTH;
 
 public:
@@ -44,9 +41,9 @@ public:
 
     bool initialize();
 
-    void setSoundEnergyLevelListener(std::function<void(long)> listener);
+    void setSoundEnergyLevelListener(std::function<void(float)> listener);
 
-    int readPcm(ogg_int16_t* buffer, int size);
+    bool readPcm(ogg_int16_t* buffer, std::function<bool(int size)> acceptor);
 
     void deInitialize();
 

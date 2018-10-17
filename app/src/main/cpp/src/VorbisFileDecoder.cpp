@@ -27,9 +27,9 @@ bool VorbisFileDecoder::initialize() {
     ogg_sync_init(&oy); /* Now we can read pages */
 
     int  bytes = BUFFER_LENGTH;
-    _buffer=ogg_sync_buffer(&oy,BUFFER_LENGTH);
+    char* buffer=ogg_sync_buffer(&oy,BUFFER_LENGTH);
 
-    _file.read(_buffer,BUFFER_LENGTH);
+    _file.read(buffer,BUFFER_LENGTH);
     ogg_sync_wrote(&oy,bytes);
 
     /* Get the first page. */
@@ -112,8 +112,8 @@ bool VorbisFileDecoder::initialize() {
             }
         }
         /* no harm in not checking before adding more */
-        _buffer=ogg_sync_buffer(&oy,BUFFER_LENGTH);
-        _file.read(_buffer,BUFFER_LENGTH);
+        buffer=ogg_sync_buffer(&oy,BUFFER_LENGTH);
+        _file.read(buffer,BUFFER_LENGTH);
         if(!_file.good()){
             return false;
         }
@@ -153,110 +153,113 @@ bool VorbisFileDecoder::initialize() {
     return true;
 }
 
-void VorbisFileDecoder::setSoundEnergyLevelListener(std::function<void(long)> listener) {
+void VorbisFileDecoder::setSoundEnergyLevelListener(std::function<void(float)> listener) {
     _soundEnergyLevelListener = listener;
 }
 
-int VorbisFileDecoder::readPcm(ogg_int16_t* outBuffer, int size) {
-    int countRes = 0;
+bool VorbisFileDecoder::readPcm(ogg_int16_t* outBuffer, std::function<bool(int size)> acceptor) {
+    if (!_file.good()) {
+        return false;
+    }
 
-    if (!_isFirst) {
-        _buffer = ogg_sync_buffer(&oy,BUFFER_LENGTH);
-        _file.read(_buffer,BUFFER_LENGTH);
-        if (!_file.good()) {
-            return -1;
-        }
+    while (ogg_sync_pageout(&oy,&og) <= 0) {
+        char * buffer = ogg_sync_buffer(&oy,BUFFER_LENGTH);
+        _file.read(buffer,BUFFER_LENGTH);
 
         ogg_sync_wrote(&oy,BUFFER_LENGTH);
     }
 
-    _isFirst = false;
-    int result=ogg_sync_pageout(&oy,&og);
-    if(result==0)
-        return -1; /* need more data */
-    if(result<0){
-        /* missing or corrupt data at this page position */
-        logstr("VorbisDecoder: Corrupt or missing data in bitstream; continuing...");
-        return 0;
-    }
     ogg_stream_pagein(&os, &og); /* can safely ignore errors at
                         this point */
     while (1) {
-        result = ogg_stream_packetout(&os, &op);
+        int result = ogg_stream_packetout(&os, &op);
 
-        if (result == 0)break; /* need more data */
-        if (result < 0) {
+        if (result == 0) {
+            break; /* need more data */
+        } else if (result < 0) {
             /* missing or corrupt data at this page position */
             /* no reason to complain; already complained above */
-        } else {
+            continue;
+        }
 
-            /* we have a packet.  Decode it */
-            float **pcm;
-            int samples;
+        /* we have a packet.  Decode it */
+        float **pcm;
+        int samples;
 
-            if (vorbis_synthesis(&vb, &op) == 0) /* test for success! */
-                vorbis_synthesis_blockin(&vd, &vb);
-            /*
+        if (vorbis_synthesis(&vb, &op) == 0) /* test for success! */
+            vorbis_synthesis_blockin(&vd, &vb);
+        /*
 
-            **pcm is a multichannel float vector.  In stereo, for
-            example, pcm[0] is left, and pcm[1] is right.  samples is
-            the size of each channel.  Convert the float values
-            (-1.<=range<=1.) to whatever PCM format and write it out */
+        **pcm is a multichannel float vector.  In stereo, for
+        example, pcm[0] is left, and pcm[1] is right.  samples is
+        the size of each channel.  Convert the float values
+        (-1.<=range<=1.) to whatever PCM format and write it out */
 
-            while ((samples = vorbis_synthesis_pcmout(&vd, &pcm)) > 0) {
-                int j;
-                int clipflag = 0;
-                int bout = (samples < _convSize ? samples : _convSize);
+        while ((samples = vorbis_synthesis_pcmout(&vd, &pcm)) > 0) {
+            int j;
+            int clipflag = 0;
+            int bout = (samples < _convSize ? samples : _convSize);
 
-                /* convert floats to 16 bit signed ints (host order) and
-                interleave */
-                for (int i = 0; i < vi.channels; i++) {
-                    ogg_int16_t *ptr = outBuffer + i;
-                    float *mono = pcm[i];
-                    for (j = 0; j < bout; j++) {
+            float sumOfSampleSquares = 0;
 
+            /* convert floats to 16 bit signed ints (host order) and
+            interleave */
+            for (int i = 0; i < vi.channels; i++) {
+                ogg_int16_t *ptr = outBuffer + i;
+                float *mono = pcm[i];
+                for (j = 0; j < bout; j++) {
+
+                    float sampleF = mono[j];
 #if 1
-                        int val = floor(mono[j] * 32767.f + .5f);
+                    int val = floor(sampleF * 32767.f + .5f);
 #else /* optional dither */
-                        int val=mono[j]*32767.f+drand48()-0.5f;
+                    int val=mono[j]*32767.f+drand48()-0.5f;
 #endif
-                        /* might as well guard against clipping */
-                        if (val > 32767) {
-                            val = 32767;
-                            clipflag = 1;
-                        }
 
-                        if (val < -32768) {
-                            val = -32768;
-                            clipflag = 1;
-                        }
+                    sumOfSampleSquares += sampleF * sampleF;
 
-                        *ptr = val;
-                        ptr += vi.channels;
+                    /* might as well guard against clipping */
+                    if (val > 32767) {
+                        val = 32767;
+                        clipflag = 1;
                     }
+
+                    if (val < -32768) {
+                        val = -32768;
+                        clipflag = 1;
+                    }
+
+                    *ptr = val;
+                    ptr += vi.channels;
                 }
-
-                if (clipflag) {
-                    logstr("VorbisDecoder: Clipping in frame n" + std::to_string(vd.sequence));
-                }
-
-                countRes = bout * vi.channels;
-
-//                writePCMDataFromVorbisDataFeed(env, &vorbisDataFeed, &writePCMDataMethodId,
-//                                               &convbuffer[0], bout * vi.channels,
-//                                               &jShortArrayWriteBuffer);
-
-                vorbis_synthesis_read(&vd, bout); /* tell libvorbis how many samples we actually consumed */
             }
+
+            if (_soundEnergyLevelListener) {
+                float result = sumOfSampleSquares/(float)(bout * vi.channels);
+                _soundEnergyLevelListener(result);
+            }
+
+            if (clipflag) {
+                logstr("VorbisDecoder: Clipping in frame n" + std::to_string(vd.sequence));
+            }
+
+            if (!acceptor(bout * vi.channels)) {
+                return false;
+            }
+
+            vorbis_synthesis_read(&vd, bout); /* tell libvorbis how many samples we actually consumed */
         }
     }
-    if (ogg_page_eos(&og))
-        return -1;
 
-    return countRes;
+    if (ogg_page_eos(&og))
+        return false;
+
+    return true;
 }
 
 void VorbisFileDecoder::deInitialize() {
+
+    _soundEnergyLevelListener = nullptr;
 
     if (_file.is_open()) {
         _file.close();

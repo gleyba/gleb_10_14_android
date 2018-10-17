@@ -5,7 +5,7 @@ import android.arch.lifecycle.MutableLiveData;
 
 public class VorbisFileDecoder {
     private final NativeRef ref;
-    private final MutableLiveData<Long> soundEnergyMutable = new MutableLiveData<>();
+    private final MutableLiveData<Float> soundEnergyMutable = new MutableLiveData<>();
 
     private static native long create(
         String fileName,
@@ -21,10 +21,10 @@ public class VorbisFileDecoder {
         SoundEnergyListener listener
     );
 
-    private static native int nativeReadPCM(
+    private static native boolean nativeReadPCM(
         long ref,
         short[] data,
-        int size
+        PcmWriteAcceptor acceptor
     );
 
     public VorbisFileDecoder(
@@ -39,7 +39,7 @@ public class VorbisFileDecoder {
         ));
     }
 
-    public LiveData<Long> soundEnergy() {
+    public LiveData<Float> soundEnergy() {
         return soundEnergyMutable;
     }
 
@@ -59,14 +59,14 @@ public class VorbisFileDecoder {
         nativeDeInitialize(ref.cRef);
     }
 
-    public int readPcm(
+    public boolean readPcm(
         short[] data,
-        int size
+        PcmWriteAcceptor acceptor
     ) {
         return nativeReadPCM(
             ref.cRef,
             data,
-            size
+            acceptor
         );
     }
 }

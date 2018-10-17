@@ -86,12 +86,10 @@ implements MainContract.ViewModel {
                     break;
                 case Playing:
                     model.stop();
-                    view.stop();
                     state.postValue(State.None);
                     break;
                 case Recording:
                     model.stop();
-                    view.stop();
                     state.postValue(State.None);
                     break;
             }

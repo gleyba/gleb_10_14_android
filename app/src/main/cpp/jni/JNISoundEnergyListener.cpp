@@ -1,31 +1,22 @@
 #include "JNISoundEnergyListener.hpp"
 #include "platform.hpp"
 
-std::once_flag JNISoundEnergyListener::sMethodsOnce;
-
-jmethodID JNISoundEnergyListener::sOnEnergyLevelCalculated;
-
 JNISoundEnergyListener::JNISoundEnergyListener(
     JNIEnv* env,
     jobject listener
 )
 : _soundEnergyListener{env,listener}
 {
-    std::call_once(
-        sMethodsOnce,
-        [env,listener]{
-            jclass type = env->GetObjectClass(listener);
-            sOnEnergyLevelCalculated = env->GetMethodID (type, "onEnergyLevelCalculated", "(J)V");
-        }
-    );
+    jclass type = env->GetObjectClass(listener);
+    _onEnergyLevelCalculated = env->GetMethodID (type, "onEnergyLevelCalculated", "(F)V");
 }
 
-void JNISoundEnergyListener::onEnergyLevelCalculated(long soundEnergy) {
+void JNISoundEnergyListener::onEnergyLevelCalculated(float soundEnergy) {
 //    logstr("onEnergyLevelCalculated: " + std::to_string(soundEnergy));
-    jlong jSoundEnergy = soundEnergy;
+    jfloat jSoundEnergy = soundEnergy;
     jniGetThreadEnv()->CallVoidMethod(
         _soundEnergyListener.get(),
-        sOnEnergyLevelCalculated,
+        _onEnergyLevelCalculated,
         jSoundEnergy
     );
 }

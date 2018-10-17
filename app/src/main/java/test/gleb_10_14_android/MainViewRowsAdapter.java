@@ -1,5 +1,6 @@
 package test.gleb_10_14_android;
 
+import android.content.Context;
 import android.databinding.DataBindingUtil;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,7 +19,13 @@ implements MainContract.View.Adapter
 {
     private ArrayList<String> items = new ArrayList<>();
 
-    public MainViewRowsAdapter() {}
+    private Integer itemPlaing = null;
+
+    private final Context ctx;
+
+    public MainViewRowsAdapter(Context ctx) {
+        this.ctx = ctx;
+    }
 
     @Override
     public ItemViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -29,7 +36,12 @@ implements MainContract.View.Adapter
 
     @Override
     public void onBindViewHolder(ItemViewHolder holder, int position) {
-        holder.binding.rowText.setText(items.get(position));
+
+        if (itemPlaing != null && itemPlaing == position) {
+            holder.binding.rowText.setText(items.get(position) + ctx.getString(R.string.playing));
+        } else {
+            holder.binding.rowText.setText(items.get(position));
+        }
     }
 
     @Override
@@ -77,5 +89,18 @@ implements MainContract.View.Adapter
     public void deleteItem(int position) {
         items.remove(position);
         notifyItemRemoved(position);
+    }
+
+    public void setItemPlaing(int position) {
+        itemPlaing = position;
+        notifyItemChanged(position);
+    }
+
+    public void setNoItemsPlaying() {
+        if (itemPlaing != null) {
+            int position = itemPlaing;
+            itemPlaing = null;
+            notifyItemChanged(position);
+        }
     }
 }

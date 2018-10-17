@@ -61,7 +61,7 @@ Java_test_gleb_110_114_1android_cppiface_VorbisFileEncoder_nativeSetEnergyLevelL
     auto listenerSh = std::make_shared<JNISoundEnergyListener>(env,listener);
 
     getRef<VorbisFileEncoder>(ref)->setSoundEnergyLevelListener(
-        [listenerSh](long level) {
+        [listenerSh](float level) {
             listenerSh->onEnergyLevelCalculated(level);
         }
     );

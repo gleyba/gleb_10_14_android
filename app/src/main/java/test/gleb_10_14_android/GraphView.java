@@ -14,9 +14,9 @@ public class GraphView extends ViewGroup {
 
     private final static int Size = 64;
 
-    private int graphArray[] = new int[Size];
-    private int maxY = 0;
-    private int minY = Integer.MAX_VALUE;
+    private float graphArray[] = new float[Size];
+    private float maxY = -1;
+    private float minY = 1;
 
     private int startPos = 0;
     private int endPos = 0;
@@ -54,7 +54,7 @@ public class GraphView extends ViewGroup {
 
     }
 
-    public void addValue(int value) {
+    public void addValue(float value) {
         graphArray[endPos] = value;
 
         if (++endPos == Size) {
@@ -95,13 +95,13 @@ public class GraphView extends ViewGroup {
         int height = getHeight();
 
         float factorX = width / (float)Size;
-        float factorY = height / (float)(maxY - minY);
+        float factorY = height / maxY - minY;
 
         int curPos = startPos;
 
         for(int i = 0; i < Size; ++i) {
             int sx = (int)(i * factorX);
-            int sy = getHeight() - (int)((graphArray[curPos] - minY)* factorY);
+            int sy = getHeight() - (int)((graphArray[curPos] - minY) * factorY);
 
             if (i != 0) {
                 path.lineTo(sx,sy);

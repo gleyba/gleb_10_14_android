@@ -1,6 +1,7 @@
 package test.gleb_10_14_android;
 
 import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.MutableLiveData;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
@@ -12,7 +13,9 @@ public class AudioRecorderTask extends AudioTaskBase {
 
     private static final String TAG = "AudioRecorderTask";
 
-    private static float Quality = 1;;
+    private static float Quality = 1;
+
+    private final MutableLiveData<Void> stoppedEvent = new MutableLiveData<>();
 
     private byte[] pcmDataBuffer = new byte[BufferSize];
 
@@ -56,8 +59,13 @@ public class AudioRecorderTask extends AudioTaskBase {
     }
 
     @Override
-    public LiveData<Long> soundEnergy() {
+    public LiveData<Float> soundEnergy() {
         return encoder.soundEnergy();
+    }
+
+    @Override
+    public LiveData<Void> stopped() {
+        return stoppedEvent;
     }
 
     @Override
@@ -70,7 +78,7 @@ public class AudioRecorderTask extends AudioTaskBase {
     @Override
     protected Void doInBackground(Void... voids) {
         while(!isCancelled()) {
-            int read = audioRecorder.read(pcmDataBuffer, 0, BufferSize);
+            int read = audioRecorder.read(pcmDataBuffer, 0, BufferMinSize );
             switch (read) {
                 case AudioRecord.ERROR_INVALID_OPERATION:
                     Log.e(TAG, "Invalid operation on AudioRecord object");
@@ -87,7 +95,9 @@ public class AudioRecorderTask extends AudioTaskBase {
             }
         }
         audioRecorder.stop();
+        audioRecorder.release();
         encoder.deInitialize();
+        stoppedEvent.postValue(null);
         return null;
     }
 

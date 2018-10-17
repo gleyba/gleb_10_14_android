@@ -1,6 +1,7 @@
 package test.gleb_10_14_android;
 
 import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.MutableLiveData;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
@@ -10,7 +11,7 @@ import test.gleb_10_14_android.cppiface.VorbisFileDecoder;
 public class AudioPlayerTask extends AudioTaskBase {
     private static final String TAG = "AudioPlayerTask";
 
-    private short[] pcmDataBuffer = new short[BufferSize];
+    private final MutableLiveData<Void> stoppedEvent = new MutableLiveData<>();
 
     static final int ChannelConfiguration
         = Channels == 1
@@ -23,7 +24,7 @@ public class AudioPlayerTask extends AudioTaskBase {
         AudioFormat.ENCODING_PCM_16BIT
     );
 
-
+    private short[] pcmDataBuffer = new short[BufferMinSize];
     private AudioTrack audioTrack = new AudioTrack(
         AudioManager.STREAM_MUSIC,
         SampleRate,
@@ -47,8 +48,13 @@ public class AudioPlayerTask extends AudioTaskBase {
     }
 
     @Override
-    public LiveData<Long> soundEnergy() {
+    public LiveData<Float> soundEnergy() {
         return decoder.soundEnergy();
+    }
+
+    @Override
+    public LiveData<Void> stopped() {
+        return stoppedEvent;
     }
 
     @Override
@@ -60,22 +66,25 @@ public class AudioPlayerTask extends AudioTaskBase {
 
     @Override
     protected Void doInBackground(Void... voids) {
-        while(!isCancelled()) {
-            int read = decoder.readPcm(pcmDataBuffer, BufferSize);
-            switch (read) {
-                case -1:
-                    break;
-                default:
-                    if (read > 0) {
-                        audioTrack.write(pcmDataBuffer, 0, read);
-                    }
-                    break;
+        while (decoder.readPcm(
+            pcmDataBuffer,
+            read -> {
+                if (isCancelled())
+                    return false;
+
+                audioTrack.write(
+                    pcmDataBuffer,
+                    0,
+                    read
+                );
+                return true;
             }
-        }
+        ));
 
         audioTrack.stop();
         audioTrack.release();
         decoder.deInitialize();
+        stoppedEvent.postValue(null);
         return null;
     }
 }

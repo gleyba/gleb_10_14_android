@@ -6,7 +6,7 @@ import android.arch.lifecycle.MutableLiveData;
 public final class VorbisFileEncoder {
 
     private final NativeRef ref;
-    private final MutableLiveData<Long> soundEnergyMutable = new MutableLiveData<>();
+    private final MutableLiveData<Float> soundEnergyMutable = new MutableLiveData<>();
 
     private static native long create(
         String fileName,
@@ -43,7 +43,7 @@ public final class VorbisFileEncoder {
         ));
     }
 
-    public LiveData<Long> soundEnergy() {
+    public LiveData<Float> soundEnergy() {
         return soundEnergyMutable;
     }
 

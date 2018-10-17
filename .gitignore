@@ -1,0 +1,6 @@
+.gradle
+.idea
+app/.externalNativeBuild
+app/build
+local.properties
+gleb_10_14_android.iml

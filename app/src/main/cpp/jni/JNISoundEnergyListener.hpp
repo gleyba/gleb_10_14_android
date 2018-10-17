@@ -4,10 +4,8 @@
 #include "jniplatform.hpp"
 
 class JNISoundEnergyListener {
-    static std::once_flag sMethodsOnce;
     GlobalRef<jobject> _soundEnergyListener;
-
-    static jmethodID sOnEnergyLevelCalculated;
+    jmethodID _onEnergyLevelCalculated;
 
 public:
 
@@ -17,6 +15,6 @@ public:
     );
 
 
-    void onEnergyLevelCalculated(long soundEnergy);
+    void onEnergyLevelCalculated(float soundEnergy);
 };
 
