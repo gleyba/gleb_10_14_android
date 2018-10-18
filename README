@@ -1,0 +1,4 @@
+Sample sound recording & playing app.
+MVVM + Databinding + LiveData
+NDK: Ogg Vorbis codec to save in files
+Video and apk in 'artifacts' dir
